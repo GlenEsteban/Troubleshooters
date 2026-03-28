@@ -3,15 +3,17 @@ using UnityEngine;
 public class Character : MonoBehaviour {
     [SerializeField] private CharacterType type;
 
+    public CharacterType Type => type;
+
     private void Awake() {
         SetCharacterTypeViaTag();
     }
     private void Start() {
-        CharacterManager.Instance.Add(this, type);
+        CharacterManager.Instance.RegisterCharacter(this);
     }
 
     private void OnDisable() {
-        CharacterManager.Instance.Remove(this);
+        CharacterManager.Instance.RemoveCharacter(this);
     }
 
     private void SetCharacterTypeViaTag() {

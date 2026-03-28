@@ -1,110 +1,230 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GroundedAIController : MonoBehaviour {
-    [Header("Targeting")]
-    [SerializeField] private bool _isFollowingTarget;
-    [SerializeField] private Transform _target;
-    [SerializeField] private float _targetingRatePerSec = 0.1f;
-    [SerializeField] private float _followingDistance= 1f;
+    [Header("General")]
+    [SerializeField] private GroundedBehavior _groundedBehavior;
 
-    [Header("Collider Detection")]
-    [SerializeField] private LayerMask _groundLayers;
-    [SerializeField] private LayerMask _obstacleLayers;
-    [SerializeField] private bool _hasEdgeDetection = true;
-    [SerializeField] private bool _hasHardStopOnEdgeDetection = true;
-    [SerializeField] private bool _hasObstacleDetection = true;
-    [SerializeField] private bool _hasHardStopOnObstacleDetection = true;    
-    [SerializeField] private float _detectionRatePerSec = 0.1f;
-    [SerializeField] private Collider2D _obstacleDetection;
-    [SerializeField] private Collider2D _groundDetection;
-    [SerializeField] private Collider2D _edgeDetection;
+    [Header("Simple Patrol Behavior")]
+    [SerializeField] private bool hasEdgeDetection = true;
+    [SerializeField] private bool hasObstacleDetection = true;
+    [SerializeField] private bool hasHardStopOnObstacleDetection = true;
+    [SerializeField] private LayerMask groundLayers;
+    [SerializeField] private LayerMask obstacleLayers;
+    [SerializeField] private Collider2D obstacleDetection;
+    [SerializeField] private Collider2D groundDetection;
+    [SerializeField] private Collider2D edgeDetection;
+    [SerializeField] private Vector2 startingMoveDirection = Vector2.right;
+    [SerializeField] private float detectionRate = 0.1f;
 
-    private Rigidbody2DMovement _rigidBody2DMovement;
-    private LookOrientation _lookOrientation;
+    [Header("Advance Patrol Behavior")]
+    [SerializeField] private bool hasStopAtPatrolPoint = true;
+    [SerializeField] private bool hasEdgeDetectionWhilePursuingPatrolPoint = true;
+    [SerializeField] private bool hasObstacleDetectionWhilePursuingPatrolPoint = true;    
+    [SerializeField] private List<Transform> patrolPoints;
+    [Range(0f, 30f), SerializeField] private float waitTimeAtPatrolPoint = 3f;
+    [Range(0.2f, 10f), SerializeField] private float stoppingDistance = 1f;
 
-    private float _targetingTimer;
-    private float _detectionTimer;
+    [Header("Follow Target Behavior")]
+    [SerializeField] private bool hasStopAtTarget = true;
+    [SerializeField] private bool hasEdgeDetectionWhileFollowingTarget = true;    
+    [SerializeField] private Transform target;
+    [SerializeField] private float targetingRatePerSec = 0.1f;
+    [Range(0.2f, 10f), SerializeField] private float followingDistance = 1f;
 
-    private bool _isGrounded;
+    private LookOrientation lookOrientation;
+    private Rigidbody2DMovement rigidBody2DMovement;
+    private GrabbableObject grabbableObject;
 
-    private Vector2 _moveDirection;
+    private bool isGrounded;
+
+    private float detectionTimer;
+    private float waitAtPatrolPointTimer;
+    private float followingTargetTimer;
+
+    public Transform targetPatrolPoint;
+    private int targetPatrolPointIndex;
+    private Vector2 moveDirection;
 
     private void Awake() {
-        _lookOrientation = GetComponent<LookOrientation>();
-        _rigidBody2DMovement = GetComponent<Rigidbody2DMovement>();
+        lookOrientation = GetComponent<LookOrientation>();
+        rigidBody2DMovement = GetComponent<Rigidbody2DMovement>();
+        grabbableObject = GetComponent<GrabbableObject>();
+    }
+
+    private void OnDisable() {
+        if (grabbableObject == null) { return; }
+
+        grabbableObject.OnGrab -= DisableControls;
+        grabbableObject.OnDrop -= EnableControls;
     }
 
     private void Start() {
-        _moveDirection = Vector2.right;
-        _rigidBody2DMovement.MoveInDirection(_moveDirection);
+        // Subscribe controller access to grabbable object events
+        if (grabbableObject != null) {
+            grabbableObject.OnGrab += DisableControls;
+            grabbableObject.OnDrop += EnableControls;
+        }
+
+        // Set transform as default patrol point if there are none
+        if (patrolPoints.Count == 0) {
+            patrolPoints.Add(transform);
+        }
+
+        // Set first patrol point as target patrol point
+        targetPatrolPoint = patrolPoints[0];
+        targetPatrolPointIndex = 0;
     }
 
     private void Update() {
-        HandleGroundDetectionBehavior();
+        isGrounded = groundDetection.IsTouchingLayers(groundLayers);
+        rigidBody2DMovement.SetCanMove(isGrounded); // Enable controls only when grounded
 
-        _targetingTimer += Time.deltaTime;
-        if (_isFollowingTarget && _targetingTimer > _targetingRatePerSec) {
-            HandleFollowingBehavior();
-        }
+        if (!isGrounded) { return; }
 
-        if (_isGrounded) {
-            _detectionTimer += Time.deltaTime;
-        }
-        if (!_isFollowingTarget && _detectionTimer > _detectionRatePerSec) {
-            HandleEdgeDetectionBehavior();
-            HandleObstacleDetectionBehavior();
-        }
-    }
-
-    private void HandleFollowingBehavior() {
-        float signedHorizontalDistanceToPlayer = _target.position.x - this.transform.position.x;
-        float horizontalDistanceToPlayer = Mathf.Abs(signedHorizontalDistanceToPlayer);
-
-        if (horizontalDistanceToPlayer > _followingDistance) {
-            _moveDirection = signedHorizontalDistanceToPlayer > 0 ? Vector2.right : Vector2.left;
-            _rigidBody2DMovement.MoveInDirection(_moveDirection);
-            _lookOrientation.SetLookOrientation(_moveDirection);
-        }
-        _targetingTimer = 0;
-    }
-
-    private void HandleGroundDetectionBehavior() {
-        if (!_groundDetection.IsTouchingLayers(_groundLayers)) {
-            _rigidBody2DMovement.SetCanMove(false);
-            _isGrounded = false;
-        }
-        else {
-            _rigidBody2DMovement.SetCanMove(true);
-            _isGrounded = true;
+        switch (_groundedBehavior) {
+            case GroundedBehavior.None:
+                rigidBody2DMovement.MoveInDirection(Vector2.zero);
+                break;
+            case GroundedBehavior.SimplePatrol:
+                SimplePatrolBehavior();
+                break;
+            case GroundedBehavior.AdvancePatrol:
+                AdvancePatrolBehviour();
+                break;
+            case GroundedBehavior.FollowTarget:
+                FollowTargetBehavior();
+                break;
         }
     }
 
-    private void HandleEdgeDetectionBehavior() {
-        if (_hasEdgeDetection && !_edgeDetection.IsTouchingLayers(_groundLayers)) {
-            if (_hasHardStopOnEdgeDetection) {
-                _rigidBody2DMovement.HardStopMovement();
+    private void SimplePatrolBehavior() {
+        if (isGrounded) {
+            detectionTimer += Time.deltaTime;
+        }
+
+        if (rigidBody2DMovement.GetMoveDirection() == Vector2.zero) {
+            rigidBody2DMovement.MoveInDirection(startingMoveDirection);
+        }
+
+        if (detectionTimer > detectionRate) {
+            TurnAroundAtEdge();
+            TurnAroundAtObstacle();
+
+            detectionTimer = 0;
+        }
+    }
+
+    private void TurnAroundAtEdge() {
+        if (hasEdgeDetection && !edgeDetection.IsTouchingLayers(groundLayers)) {
+            rigidBody2DMovement.HardStopMovement();
+
+            Vector2 newDirection = -rigidBody2DMovement.GetMoveDirection();
+            rigidBody2DMovement.FlipHorizontalDirection();
+            lookOrientation.SetLookOrientation(newDirection);
+        }
+    }
+
+    private void TurnAroundAtObstacle() {
+        if (hasObstacleDetection && obstacleDetection.IsTouchingLayers(obstacleLayers)) {
+            if (hasHardStopOnObstacleDetection) {
+                rigidBody2DMovement.HardStopMovement();
             }
 
-            Vector2 newDirection = -_rigidBody2DMovement.GetMoveDirection();
-            _rigidBody2DMovement.FlipHorizontalDirection();
-            _lookOrientation.SetLookOrientation(newDirection);
-
-            _detectionTimer = 0;
+            Vector2 newDirection = -rigidBody2DMovement.GetMoveDirection();
+            rigidBody2DMovement.MoveInDirection(newDirection);
+            lookOrientation.SetLookOrientation(newDirection);
         }
     }
 
-    private void HandleObstacleDetectionBehavior() {
-        if (_hasObstacleDetection && _obstacleDetection.IsTouchingLayers(_obstacleLayers)) {
+    private void AdvancePatrolBehviour() {
+        float signedHorizontalDistanceToTargetPatrolPoint = targetPatrolPoint.position.x - transform.position.x;
+        float horizontalDistanceToTargetPatrolPoint = Mathf.Abs(signedHorizontalDistanceToTargetPatrolPoint);
 
-            if (_hasHardStopOnObstacleDetection) {
-                _rigidBody2DMovement.HardStopMovement();
+        if (horizontalDistanceToTargetPatrolPoint <= stoppingDistance) {
+            waitAtPatrolPointTimer += Time.deltaTime;
+
+            if (waitAtPatrolPointTimer > waitTimeAtPatrolPoint) {
+                if (targetPatrolPointIndex < patrolPoints.Count - 1) {
+                    targetPatrolPointIndex++;
+                    targetPatrolPoint = patrolPoints[targetPatrolPointIndex];
+                }
+                else {
+                    targetPatrolPointIndex = 0;
+                    targetPatrolPoint = patrolPoints[0];
+                }
+
+                waitAtPatrolPointTimer = 0;
             }
 
-            Vector2 newDirection = -_rigidBody2DMovement.GetMoveDirection();
-            _rigidBody2DMovement.MoveInDirection(newDirection);
-            _lookOrientation.SetLookOrientation(newDirection);
+            if (hasStopAtPatrolPoint) {
+                rigidBody2DMovement.MoveInDirection(Vector2.zero);
+            }
+        }
 
-            _detectionTimer = 0;
+        if (horizontalDistanceToTargetPatrolPoint > stoppingDistance) {
+            moveDirection = signedHorizontalDistanceToTargetPatrolPoint > 0 ? Vector2.right : Vector2.left;
+            rigidBody2DMovement.MoveInDirection(moveDirection);
+            lookOrientation.SetLookOrientation(moveDirection);
+        }
+
+        if (hasEdgeDetectionWhilePursuingPatrolPoint && !edgeDetection.IsTouchingLayers(groundLayers)) {
+            if (rigidBody2DMovement.GetMoveDirection() == Vector2.zero) { return; }
+
+            rigidBody2DMovement.HardStopMovement();
+            rigidBody2DMovement.MoveInDirection(Vector2.zero);
+        }
+
+        if (hasObstacleDetectionWhilePursuingPatrolPoint && obstacleDetection.IsTouchingLayers(obstacleLayers)) {
+            if (rigidBody2DMovement.GetMoveDirection() == Vector2.zero) { return; }
+
+            rigidBody2DMovement.HardStopMovement();
+            rigidBody2DMovement.MoveInDirection(Vector2.zero);
         }
     }
+
+    private void FollowTargetBehavior() {
+        if (isGrounded) {
+            followingTargetTimer += Time.deltaTime;
+        }
+
+        if (followingTargetTimer > targetingRatePerSec) {
+            float signedHorizontalDistanceToTarget = target.position.x - transform.position.x;
+            float horizontalDistanceToTarget = Mathf.Abs(signedHorizontalDistanceToTarget);
+            if (horizontalDistanceToTarget > followingDistance) {
+                moveDirection = signedHorizontalDistanceToTarget > 0 ? Vector2.right : Vector2.left;
+                rigidBody2DMovement.MoveInDirection(moveDirection);
+                lookOrientation.SetLookOrientation(moveDirection);
+            }
+
+            if (hasStopAtTarget && horizontalDistanceToTarget < followingDistance) {
+                rigidBody2DMovement.MoveInDirection(Vector2.zero);
+            }
+
+            followingTargetTimer = 0;
+        }
+
+        if (hasEdgeDetectionWhileFollowingTarget && !edgeDetection.IsTouchingLayers(groundLayers)) {
+            if (rigidBody2DMovement.GetMoveDirection() == Vector2.zero) { return; }
+            
+            rigidBody2DMovement.HardStopMovement();            
+            rigidBody2DMovement.MoveInDirection(Vector2.zero);
+        }
+    }
+
+    public void EnableControls() {
+        rigidBody2DMovement.SetCanMove(true);
+    }
+
+    public void DisableControls() {
+        rigidBody2DMovement.HardStopMovement();
+        rigidBody2DMovement.SetCanMove(false);
+    }
+}
+
+public enum GroundedBehavior {
+    None,
+    SimplePatrol,
+    AdvancePatrol,
+    FollowTarget
 }

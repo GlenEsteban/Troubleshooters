@@ -5,10 +5,8 @@ using UnityEngine;
 public class AirborneAIController : MonoBehaviour {
     [Header("General")]
     [SerializeField] private AirborneBehavior _airborneBehavior;
-    [SerializeField] private float _detectionRate = 0.1f;
 
     [Header("Simple Patrol Behavior")]
-    [SerializeField] private Vector2 _startingMoveDirection = Vector2.right;
     [SerializeField] private bool _hasFrontObstacleDetection = true;
     [SerializeField] private bool _hasCeilingObstacleDetection = true;
     [SerializeField] private bool _hasGroundObstacleDetection = true;
@@ -17,6 +15,8 @@ public class AirborneAIController : MonoBehaviour {
     [SerializeField] private Collider2D _horizontalObstacleDetector;
     [SerializeField] private Collider2D _ceilingObstacleDetector;
     [SerializeField] private Collider2D _groundObstacleDetector;
+    [SerializeField] private Vector2 _startingMoveDirection = Vector2.right;
+    [SerializeField] private float _detectionRate = 0.1f;
 
     [Header("Advance Patrol Behavior")]
     [SerializeField] private List<Transform> _patrolPoints;
@@ -33,6 +33,7 @@ public class AirborneAIController : MonoBehaviour {
 
     private float _detectionTimer;
     private float _waitAtPatrolPointTimer;
+
     public Transform _targetPatrolPoint;
     private int _targetPatrolPointIndex;
 
@@ -44,11 +45,13 @@ public class AirborneAIController : MonoBehaviour {
         _grabbableObject = GetComponent<GrabbableObject>();
     }
     private void OnDisable() {
+        if (_grabbableObject == null) { return; }
+
         _grabbableObject.OnGrab -= DisableControls;
         _grabbableObject.OnDrop -= EnableControls;
     }
     void Start() {
-        _rigidBody2DMovement.MoveInDirection(_startingMoveDirection);
+        // Subscribe controller access to grabbable object events
         if (_grabbableObject != null) {
             _grabbableObject.OnGrab += DisableControls;
             _grabbableObject.OnDrop += EnableControls;
@@ -59,7 +62,7 @@ public class AirborneAIController : MonoBehaviour {
             _patrolPoints.Add(transform);
         }
 
-        // Set first patrtol point as target patrol point
+        // Set first patrol point as target patrol point
         _targetPatrolPoint = _patrolPoints[0];
         _targetPatrolPointIndex = 0;
     }
@@ -67,6 +70,7 @@ public class AirborneAIController : MonoBehaviour {
     private void Update() {
         switch (_airborneBehavior) {
             case AirborneBehavior.None:
+                _rigidBody2DMovement.MoveInDirection(Vector2.zero);
                 break;
             case AirborneBehavior.SimplePatrol:
                 SimplePatrolBehavior();
@@ -89,13 +93,13 @@ public class AirborneAIController : MonoBehaviour {
 
         _detectionTimer += Time.deltaTime;
         if (_detectionTimer > _detectionRate) {
-            DetectAndReflectAtObstacle();
+            ReflectMoveDirectionAtObstacle();
 
             _detectionTimer = 0;
         }
     }
 
-    private void DetectAndReflectAtObstacle() {
+    private void ReflectMoveDirectionAtObstacle() {
         if (_hasFrontObstacleDetection && _horizontalObstacleDetector.IsTouchingLayers(_obstacleLayers)) {
             if (_hasHardStopOnObstacleDetection) {
                 _rigidBody2DMovement.HardStopMovement();
@@ -138,8 +142,8 @@ public class AirborneAIController : MonoBehaviour {
          
         float distanceFromPatrolPoint = Vector2.Distance((Vector2) _targetPatrolPoint.position, (Vector2) transform.position);
         if (distanceFromPatrolPoint <= _stoppingDistance) {
-            print(_waitAtPatrolPointTimer);
             _waitAtPatrolPointTimer += Time.deltaTime;
+
             if (_waitAtPatrolPointTimer > _waitTimeAtPatrolPoint) {
                 if (_targetPatrolPointIndex < _patrolPoints.Count - 1) {
                     _targetPatrolPointIndex++;
@@ -149,8 +153,6 @@ public class AirborneAIController : MonoBehaviour {
                     _targetPatrolPointIndex = 0;
                     _targetPatrolPoint = _patrolPoints[0];
                 }
-
-                _navMeshRigidbody2DMovement.MoveToTarget(_targetPatrolPoint.position);
 
                 _waitAtPatrolPointTimer = 0;
             }

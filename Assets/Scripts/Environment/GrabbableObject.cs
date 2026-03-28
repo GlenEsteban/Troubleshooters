@@ -24,11 +24,11 @@ public class GrabbableObject : MonoBehaviour {
     }
 
     private void Start() {
-        InteractableObjectManager.Instance.Add(this.gameObject);
+        InteractableObjectManager.Instance.RegisterObject(this.gameObject);
     }
 
     private void OnDisable() {
-        InteractableObjectManager.Instance.Remove(this.gameObject);
+        InteractableObjectManager.Instance.UnregisterObject(this.gameObject);
     }
     class AnchorPoint {
         public Vector2 localAnchor;

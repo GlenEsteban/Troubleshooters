@@ -37678,149 +37678,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!1 &572292932
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 572292933}
-  - component: {fileID: 572292935}
-  - component: {fileID: 572292934}
-  m_Layer: 0
-  m_Name: AudioManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &572292933
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 572292932}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1925219506}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!82 &572292934
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 572292932}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
---- !u!114 &572292935
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 572292932}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 609d2ced36d8cd74fab2303a6a2636b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
-  audioSource: {fileID: 0}
 --- !u!1 &573695507
 GameObject:
   m_ObjectHideFlags: 0
@@ -40407,9 +40264,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89d9f1d75ca4a0f4fa22f5ad5d7313eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 10
-  deceleration: 5
-  maxMoveSpeed: 8
+  _acceleration: 30
+  _deceleration: 5
+  _maxMoveSpeed: 5
 --- !u!1 &1262258173
 GameObject:
   m_ObjectHideFlags: 0
@@ -44940,9 +44797,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89d9f1d75ca4a0f4fa22f5ad5d7313eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rigidbody2DMovement
-  acceleration: 10
-  deceleration: 5
-  maxMoveSpeed: 8
+  _acceleration: 100
+  _deceleration: 5
+  _maxMoveSpeed: 100
 --- !u!114 &1524320456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45200,9 +45057,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89d9f1d75ca4a0f4fa22f5ad5d7313eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 10
-  deceleration: 5
-  maxMoveSpeed: 8
+  _acceleration: 20
+  _deceleration: 5
+  _maxMoveSpeed: 8
 --- !u!114 &1533485078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51230,7 +51087,6 @@ Transform:
   - {fileID: 170690385}
   - {fileID: 191828589}
   - {fileID: 206581476}
-  - {fileID: 572292933}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1970536435
@@ -56423,32 +56279,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _groundedBehavior: 2
-  hasEdgeDetection: 1
-  hasObstacleDetection: 1
-  hasHardStopOnObstacleDetection: 1
-  groundLayers:
+  _hasEdgeDetection: 1
+  _hasObstacleDetection: 1
+  _hasHardStopOnObstacleDetection: 0
+  _groundLayers:
     serializedVersion: 2
-    m_Bits: 0
-  obstacleLayers:
+    m_Bits: 3456
+  _obstacleLayers:
     serializedVersion: 2
-    m_Bits: 0
-  obstacleDetection: {fileID: 0}
-  groundDetection: {fileID: 0}
-  edgeDetection: {fileID: 0}
-  startingMoveDirection: {x: 1, y: 0}
-  detectionRate: 0.1
-  hasStopAtPatrolPoint: 1
-  hasEdgeDetectionWhilePursuingPatrolPoint: 1
-  hasObstacleDetectionWhilePursuingPatrolPoint: 1
-  patrolPoints: []
-  waitTimeAtPatrolPoint: 3
-  stoppingDistance: 1
-  hasStopAtTarget: 1
-  hasEdgeDetectionWhileFollowingTarget: 1
-  target: {fileID: 0}
-  targetingRatePerSec: 0.1
-  followingDistance: 1
-  targetPatrolPoint: {fileID: 0}
+    m_Bits: 8064
+  _obstacleDetection: {fileID: 26901123}
+  _groundDetection: {fileID: 457400138}
+  _edgeDetection: {fileID: 1107383680}
+  _startingMoveDirection: {x: 1, y: 0}
+  _detectionRate: 0.1
+  _hasStopAtPatrolPoint: 1
+  _hasEdgeDetectionWhilePursuingPatrolPoint: 1
+  _hasObstacleDetectionWhilePursuingPatrolPoint: 1
+  _patrolPoints:
+  - {fileID: 1524320446}
+  - {fileID: 1111494195}
+  _waitTimeAtPatrolPoint: 3
+  _stoppingDistance: 0.2
+  _hasStopAtTarget: 1
+  _hasEdgeDetectionWhileFollowingTarget: 1
+  _target: {fileID: 1533485073}
+  _targetingRatePerSec: 0.05
+  _followingDistance: 0.2
+  _targetPatrolPoint: {fileID: 0}
 --- !u!4 &8416674493269540872
 Transform:
   m_ObjectHideFlags: 0

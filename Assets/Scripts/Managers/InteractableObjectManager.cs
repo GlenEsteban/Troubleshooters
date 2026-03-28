@@ -1,29 +1,43 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Central manager responsible for tracking and classifying all interactable objects.
+/// Other systems should query this class instead of storing direct references
+/// to multiple interactable objects.
+/// </summary>
 public class InteractableObjectManager : MonoBehaviour {
     public static InteractableObjectManager Instance { get; private set; }
 
-    [SerializeField] private List<GameObject> _interactableObjects= new List<GameObject>();
-    public IReadOnlyList<GameObject> Items => _interactableObjects.AsReadOnly();
+    [SerializeField] private List<GameObject> interactableObjects= new List<GameObject>();
 
-    public void Add(GameObject obj) {
-        if (_interactableObjects.Contains(obj)) return;
-        _interactableObjects.Add(obj);
-    }
-    public void Remove(GameObject obj) {
-        _interactableObjects.Remove(obj);
-    }
-    public bool Contains(GameObject obj) {
-        return _interactableObjects.Contains(obj);
-    }
+    public IReadOnlyList<GameObject> InteractableObjects => interactableObjects.AsReadOnly();
 
     private void Awake() {
-        if (Instance != null &&  Instance != this) {
-            Destroy(this);
+        // Ensure only one instance exists
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
+            return;
         }
-        else {
-            Instance = this;
+
+        Instance = this;
+    }
+
+    /// <summary>
+    /// Registers an object with the manager.
+    /// </summary>
+    public void RegisterObject(GameObject obj) {
+        if (!interactableObjects.Contains(obj)) {
+            interactableObjects.Add(obj);
+        }
+    }
+
+    /// <summary>
+    /// Unregisters an object from the manager.
+    /// </summary>
+    public void UnregisterObject(GameObject obj) {
+        if (interactableObjects.Contains(obj)) {
+            interactableObjects.Remove(obj);
         }
     }
 }

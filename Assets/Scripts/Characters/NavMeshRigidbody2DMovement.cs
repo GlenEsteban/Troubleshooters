@@ -58,7 +58,7 @@ public class NavMeshRigidbody2DMovement : MonoBehaviour {
 
         Vector2 desiredDirection = _navMeshAgent.desiredVelocity.normalized;
 
-        if (!_navMeshAgent.isOnNavMesh || _navMeshAgent.pathPending || !_navMeshAgent.hasPath || 
+        if (!_navMeshAgent.isOnNavMesh || _navMeshAgent.pathPending || !_navMeshAgent.hasPath ||
             _navMeshAgent.remainingDistance <= _stoppingDistance) {
             _rb.linearVelocity -= _deceleration * _rb.linearVelocity * Time.deltaTime;
         }

@@ -2,60 +2,60 @@ using UnityEngine;
 
 // Handles movement and orientation using Rigidbody2D
 public class Rigidbody2DMovement : MonoBehaviour {
-    [Range(1f, 100f), SerializeField] float _acceleration = 10f;
-    [Range(1f, 100f), SerializeField] float _deceleration = 5f;
-    [Range(1f, 100f), SerializeField] float _maxMoveSpeed = 8f;
+    [Range(1f, 100f), SerializeField] float acceleration = 10f;
+    [Range(1f, 100f), SerializeField] float deceleration = 5f;
+    [Range(1f, 100f), SerializeField] float maxMoveSpeed = 8f;
 
-    private Rigidbody2D _rb;
+    private bool canMove = true;
 
-    private Vector2 _moveDirection;
+    private Rigidbody2D rb;
 
-    private bool _canMove = true;
+    private Vector2 moveDirection;
 
     public void SetCanMove(bool state) {
-        _canMove = state;
+        canMove = state;
     }
 
     public Vector2 GetMoveDirection() {
-        return _moveDirection;
+        return moveDirection;
     }
 
     private void Awake() {
-        _rb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void LateUpdate() {
-        if (!_canMove) { return; }
+        if (!canMove) { return; }
 
-        if (_moveDirection != Vector2.zero && _rb.linearVelocity.magnitude < _maxMoveSpeed) {
-            _rb.linearVelocity += _acceleration * _moveDirection * Time.deltaTime;
-            _rb.linearVelocity = Vector2.ClampMagnitude(_rb.linearVelocity, _maxMoveSpeed);
+        if (moveDirection != Vector2.zero && rb.linearVelocity.magnitude < maxMoveSpeed) {
+            rb.linearVelocity += acceleration * moveDirection * Time.deltaTime;
+            rb.linearVelocity = Vector2.ClampMagnitude(rb.linearVelocity, maxMoveSpeed);
         }
         else {
-            _rb.linearVelocity -= _deceleration * _rb.linearVelocity * Time.deltaTime;
+            rb.linearVelocity -= deceleration * rb.linearVelocity * Time.deltaTime;
         }
     }
     public void MoveInDirection(Vector2 direction) {
-        _moveDirection = direction.normalized;
+        moveDirection = direction.normalized;
     }
 
     public void StopMovement() {
-        _moveDirection = Vector2.zero;
+        moveDirection = Vector2.zero;
     }
 
     public void HardStopMovement() {
-        _rb.linearVelocity = Vector3.zero;
+        rb.linearVelocity = Vector3.zero;
     }
 
     public void FlipHorizontalDirection() {
-        _moveDirection.x = -_moveDirection.x;
+        moveDirection.x = -moveDirection.x;
     }
 
     public void MoveTowardPosition(Vector2 position) {
-        _moveDirection = position - _rb.position;
+        moveDirection = position - rb.position;
     }
 
     public void SetLinearVelocity(Vector2 velocity) {
-        _rb.linearVelocity = velocity;
+        rb.linearVelocity = velocity;
     }
 }

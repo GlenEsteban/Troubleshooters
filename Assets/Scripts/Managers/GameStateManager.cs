@@ -1,37 +1,42 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// Central manager responsible for controlling game flow and handling game state changes.
+/// Other systems should use this class to change or query the current game state.
+/// </summary>
 public class GameStateManager : MonoBehaviour {
     public static GameStateManager Instance { get; private set; }
 
-    [SerializeField] private SceneLoader _sceneLoader;
-    [SerializeField] private BGMPlayer _bgmPlayer;
+    [SerializeField] private SceneLoader sceneLoader;
+    [SerializeField] private BGMPlayer bgmPlayer; 
+    [SerializeField] private PlayerController playerController;
+    [SerializeField] private GameObject levelIntroUI;
+    [SerializeField] private GameObject levelIntroSFX;
+    [SerializeField] private GameObject reloadLevelTransitionUI;
 
-    [SerializeField] private PlayerController _playerController;
+    private bool hasStartedLevel = false;
 
-    [SerializeField] private GameObject _levelIntroUI;
-    [SerializeField] private GameObject _levelIntroSFX;
-    [SerializeField] private GameObject _reloadLevelTransitionUI;
+    private GameState currentGameState = GameState.None;
 
-    private static bool _hasStartedLevel = false;
-
-    private GameState _currentGameState;
+    public GameState CurrentGameState => currentGameState;
 
     private void Awake() {
-        if (Instance != null && Instance != this) { 
+        // Ensure only one instance exists
+        if (Instance != null && Instance != this) {
             Destroy(gameObject);
+            return;
         }
-        else {
-            Instance = this;
-        }
+
+        Instance = this;
     }
 
     private void Start() {
-        RunGameStart();
+        ChangeGameState(GameState.GameStart);
     }
 
-    // TEMP: INPUT FOR TESTING GAME STATE CHANGES
     private void Update() {
+        // TEMP: INPUT FOR TESTING GAME STATE CHANGES
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
             ChangeGameState(GameState.GameStart);
         }
@@ -40,10 +45,14 @@ public class GameStateManager : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Changes the current game state and runs the logic associated with the new state.
+    /// </summary>
+    /// <param name="state">The game state to switch to.</param>
     public void ChangeGameState(GameState state) {
-        if (_currentGameState == state) { return; }
+        if (currentGameState == state) { return; }
 
-        _currentGameState = state;
+        currentGameState = state;
 
         switch (state) {
             case GameState.GameStart:
@@ -57,67 +66,71 @@ public class GameStateManager : MonoBehaviour {
                 break;
         }
     }
-
     private void RunGameStart() {
-        if (!_hasStartedLevel) {
+        if (!hasStartedLevel) {
             StartCoroutine(LevelIntro());
 
-            _hasStartedLevel = true;
+            hasStartedLevel = true;
         }
         else {
-            _levelIntroUI.SetActive(false);
-            _levelIntroSFX.SetActive(false);
+            levelIntroUI.SetActive(false);
+            levelIntroSFX.SetActive(false);
 
-            _reloadLevelTransitionUI.SetActive(true);
+            reloadLevelTransitionUI.SetActive(true);
 
             StartCoroutine(LevelReload());
         }
     }
 
     private void RunGameWin() {
-        _bgmPlayer.PlayGameWinBGM();
-        
-        _hasStartedLevel = false;
+        bgmPlayer.PlayGameWinBGM();
 
-        StartCoroutine(_sceneLoader.LoadNextScene(3f));
+        StartCoroutine(sceneLoader.LoadNextScene(3f));
+
+        hasStartedLevel = false;
     }
+
     private void RunGameOver() {
-        _bgmPlayer.StopMusic();
+        bgmPlayer.StopMusic();
 
-        StartCoroutine(_sceneLoader.ReloadScene(3f));        
+        StartCoroutine(sceneLoader.ReloadScene(3f));
+
+        hasStartedLevel = false;
     }
-    public IEnumerator LevelIntro() {
-        _levelIntroUI.SetActive(true);
-        _levelIntroSFX.SetActive(true);
 
-        _reloadLevelTransitionUI.SetActive(false);
+    /// <summary>
+    /// Plays the intro sequence before gameplay begins.
+    /// </summary>
+    private IEnumerator LevelIntro() {
+        levelIntroUI.SetActive(true);
+        levelIntroSFX.SetActive(true);
+        reloadLevelTransitionUI.SetActive(false);
 
-        _playerController.enabled = false;
+        playerController.enabled = false;
 
         yield return new WaitForSeconds(4f);
 
-        _bgmPlayer.PlayMainBGM();
+        bgmPlayer.PlayMainBGM();
 
-        _playerController.enabled = true;
+        playerController.enabled = true;
     }
-    public IEnumerator LevelReload() {
-        _levelIntroUI.SetActive(false);
-        _levelIntroSFX.SetActive(false);
 
-        _reloadLevelTransitionUI.SetActive(true);
+    /// <summary>
+    /// Plays the reload transition before gameplay resumes.
+    /// </summary>
+    private IEnumerator LevelReload() {
+        levelIntroUI.SetActive(false);
+        levelIntroSFX.SetActive(false);
 
-        _playerController.enabled = false;
+        reloadLevelTransitionUI.SetActive(true);
+
+        playerController.enabled = false;
 
         yield return new WaitForSeconds(1f);
 
-        _bgmPlayer.PlayMainBGM();
+        bgmPlayer.PlayMainBGM();
 
-        _playerController.enabled = true;
+        playerController.enabled = true;
     }
-}
 
-public enum GameState {
-    GameStart,
-    GameWin,
-    GameOver,
 }
