@@ -1,27 +1,24 @@
 using UnityEngine;
 
+/// <summary>
+/// Triggers background music playback and delegates it to the AudioManager.
+/// </summary>
 public class BGMPlayer: MonoBehaviour {
-    [SerializeField] AudioClip _mainBGM;
-    [SerializeField] AudioClip _gameWinBGM;
+    [SerializeField] private AudioClip mainBGM;
+    [SerializeField] private AudioClip gameWinBGM;
 
-    AudioSource bgmAudioSource;
-
-    private void Awake() {
-        bgmAudioSource = GetComponent<AudioSource>();
-    }
+    [SerializeField] private bool loopMainBGM = true;
+    [SerializeField] private bool loopGameWinBGM = true;
 
     public void PlayMainBGM() {
-        bgmAudioSource.loop = true;
-        bgmAudioSource.clip = _mainBGM;
-        bgmAudioSource.Play();
-    }
-    public void PlayGameWinBGM() {
-        bgmAudioSource.loop = true;
-        bgmAudioSource.clip = _gameWinBGM;
-        bgmAudioSource.Play();
-    }
+        if (mainBGM == null) { return; }
 
-    public void StopMusic() {
-        bgmAudioSource.Stop();
+        AudioManager.Instance.PlayMusic(mainBGM, loopMainBGM);
+    }
+        
+    public void PlayGameWinBGM() {
+        if (gameWinBGM == null) { return; }
+
+        AudioManager.Instance.PlayMusic(gameWinBGM, loopGameWinBGM);
     }
 }

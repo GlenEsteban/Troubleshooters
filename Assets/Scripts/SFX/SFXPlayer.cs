@@ -1,19 +1,20 @@
 using UnityEngine;
 
+/// <summary>
+/// Triggers sound effect playback by selecting an audio clip
+/// and delegating playback to the AudioManager.
+/// </summary>
 public class SFXPlayer : MonoBehaviour {
-    [SerializeField] AudioClip _sfx;
-    private AudioSource _audioSource;
-
-    private void Awake() {
-        _audioSource = GetComponent<AudioSource>();
-    }
+    [SerializeField, Tooltip("One or more clips; plays randomly if multiple are assigned")]
+    private AudioClip[] audioClips; 
     public void PlaySFX() {
-        _audioSource.loop = false;
-        _audioSource.clip = _sfx;
-        _audioSource.Play();
-    }
+        if (audioClips == null || audioClips.Length == 0) { return; }
 
-    public void StopSFX() {
-        _audioSource.Stop();
+        if (audioClips.Length == 1) {
+            AudioManager.Instance.PlayAudioClip(audioClips[0]);
+        }
+        else {
+            AudioManager.Instance.PlayRandomAudioClip(audioClips);
+        }
     }
 }

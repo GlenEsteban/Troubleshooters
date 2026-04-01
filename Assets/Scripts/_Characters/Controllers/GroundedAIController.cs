@@ -132,7 +132,7 @@ public class GroundedAIController : MonoBehaviour {
             }
 
             Vector2 newDirection = -rigidBody2DMovement.GetMoveDirection();
-            rigidBody2DMovement.MoveInDirection(newDirection);
+            rigidBody2DMovement.FlipHorizontalDirection();
             lookOrientation.SetLookOrientation(newDirection);
         }
     }

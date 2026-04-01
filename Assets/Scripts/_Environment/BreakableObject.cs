@@ -9,6 +9,7 @@ public class BreakableObject : MonoBehaviour {
     [SerializeField] private float _speedTillShatter = 3f;
     [SerializeField] private LayerMask _shatterLayers;
 
+
     private Rigidbody2D _rb;
     private Collider2D _collider;
     private ParticleSystem _shatterParticles;

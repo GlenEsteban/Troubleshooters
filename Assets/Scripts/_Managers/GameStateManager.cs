@@ -12,7 +12,7 @@ public class GameStateManager : MonoBehaviour {
     [SerializeField] private BGMPlayer bgmPlayer; 
     [SerializeField] private PlayerController playerController;
     [SerializeField] private GameObject levelIntroUI;
-    [SerializeField] private GameObject levelIntroSFX;
+    [SerializeField] private SFXPlayer levelIntroSFX;
     [SerializeField] private GameObject reloadLevelTransitionUI;
 
     private bool hasStartedLevel = false;
@@ -74,7 +74,7 @@ public class GameStateManager : MonoBehaviour {
         }
         else {
             levelIntroUI.SetActive(false);
-            levelIntroSFX.SetActive(false);
+            levelIntroSFX.PlaySFX();
 
             reloadLevelTransitionUI.SetActive(true);
 
@@ -85,15 +85,15 @@ public class GameStateManager : MonoBehaviour {
     private void RunGameWin() {
         bgmPlayer.PlayGameWinBGM();
 
-        StartCoroutine(sceneLoader.LoadNextScene(3f));
+       sceneLoader.LoadNextScene(3f);
 
         hasStartedLevel = false;
     }
 
     private void RunGameOver() {
-        bgmPlayer.StopMusic();
+        AudioManager.Instance.StopMusic();
 
-        StartCoroutine(sceneLoader.ReloadScene(3f));
+        sceneLoader.ReloadScene(3f);
 
         hasStartedLevel = false;
     }
@@ -103,10 +103,12 @@ public class GameStateManager : MonoBehaviour {
     /// </summary>
     private IEnumerator LevelIntro() {
         levelIntroUI.SetActive(true);
-        levelIntroSFX.SetActive(true);
         reloadLevelTransitionUI.SetActive(false);
-
         playerController.enabled = false;
+
+        yield return new WaitForSeconds(0.5f);
+
+        levelIntroSFX.PlaySFX();
 
         yield return new WaitForSeconds(4f);
 
@@ -120,7 +122,6 @@ public class GameStateManager : MonoBehaviour {
     /// </summary>
     private IEnumerator LevelReload() {
         levelIntroUI.SetActive(false);
-        levelIntroSFX.SetActive(false);
 
         reloadLevelTransitionUI.SetActive(true);
 
