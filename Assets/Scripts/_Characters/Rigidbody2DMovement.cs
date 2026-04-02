@@ -2,7 +2,7 @@ using UnityEngine;
 
 // Handles movement and orientation using Rigidbody2D
 public class Rigidbody2DMovement : MonoBehaviour {
-    [Range(1f, 100f), SerializeField] float acceleration = 10f;
+    [Range(1f, 100f), SerializeField] float acceleration = 20f;
     [Range(1f, 100f), SerializeField] float deceleration = 5f;
     [Range(1f, 100f), SerializeField] float maxMoveSpeed = 8f;
 

@@ -66,6 +66,7 @@ public class GameStateManager : MonoBehaviour {
                 break;
         }
     }
+
     private void RunGameStart() {
         if (!hasStartedLevel) {
             StartCoroutine(LevelIntro());
@@ -133,5 +134,4 @@ public class GameStateManager : MonoBehaviour {
 
         playerController.enabled = true;
     }
-
 }

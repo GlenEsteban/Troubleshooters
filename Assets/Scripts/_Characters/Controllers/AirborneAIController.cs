@@ -47,14 +47,14 @@ public class AirborneAIController : MonoBehaviour {
     private void OnDisable() {
         if (_grabbableObject == null) { return; }
 
-        _grabbableObject.OnGrab -= DisableControls;
-        _grabbableObject.OnDrop -= EnableControls;
+        _grabbableObject.Grabbed -= DisableControls;
+        _grabbableObject.Dropped -= EnableControls;
     }
     void Start() {
         // Subscribe controller access to grabbable object events
         if (_grabbableObject != null) {
-            _grabbableObject.OnGrab += DisableControls;
-            _grabbableObject.OnDrop += EnableControls;
+            _grabbableObject.Grabbed += DisableControls;
+            _grabbableObject.Dropped += EnableControls;
         }
 
         // Set transform as default patrol point if there are none

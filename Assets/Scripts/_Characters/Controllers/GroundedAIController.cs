@@ -55,15 +55,15 @@ public class GroundedAIController : MonoBehaviour {
     private void OnDisable() {
         if (grabbableObject == null) { return; }
 
-        grabbableObject.OnGrab -= DisableControls;
-        grabbableObject.OnDrop -= EnableControls;
+        grabbableObject.Grabbed -= DisableControls;
+        grabbableObject.Dropped -= EnableControls;
     }
 
     private void Start() {
         // Subscribe controller access to grabbable object events
         if (grabbableObject != null) {
-            grabbableObject.OnGrab += DisableControls;
-            grabbableObject.OnDrop += EnableControls;
+            grabbableObject.Grabbed += DisableControls;
+            grabbableObject.Dropped += EnableControls;
         }
 
         // Set transform as default patrol point if there are none

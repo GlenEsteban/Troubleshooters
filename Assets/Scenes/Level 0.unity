@@ -2041,7 +2041,7 @@ Transform:
   m_GameObject: {fileID: 396622614}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.82, y: 1.86, z: 0}
+  m_LocalPosition: {x: 5.54, y: -0.48, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2088,7 +2088,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
-  _isGrabbable: 1
   stiffness: 1000
   damping: 30
   maxForce: 1000
@@ -37131,7 +37130,6 @@ GameObject:
   - component: {fileID: 488336181}
   - component: {fileID: 488336179}
   - component: {fileID: 488336183}
-  - component: {fileID: 488336190}
   - component: {fileID: 488336191}
   - component: {fileID: 488336192}
   m_Layer: 12
@@ -37208,103 +37206,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
---- !u!82 &488336190
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 488336178}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: a670ca460b20dae49a11be642e6c5d22, type: 3}
-  m_PlayOnAwake: 0
-  m_Volume: 0.664
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &488336191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37317,11 +37218,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2287d349ff5b0be4ea9d421396b933e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _isFragile: 1
-  _speedTillShatter: 4
-  _shatterLayers:
+  minImpactSpeedToBreak: 3
+  validImpactLayers:
     serializedVersion: 2
-    m_Bits: 8064
+    m_Bits: 3968
+  shatterParticles: {fileID: 1571426069}
 --- !u!114 &488336192
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37334,7 +37235,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
-  _isGrabbable: 1
   stiffness: 500
   damping: 10
   maxForce: 200
@@ -39632,7 +39532,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
-  _isGrabbable: 1
   stiffness: 1000
   damping: 30
   maxForce: 1000
@@ -39833,8 +39732,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainBGM: {fileID: 8300000, guid: f84b4b1ccf509de4aa5e36abe56ca776, type: 3}
-  gameWinBGM: {fileID: 8300000, guid: 3d5468c0edffc2b47a36c74e79882da3, type: 3}
   loopMainBGM: 1
+  gameWinBGM: {fileID: 8300000, guid: 3d5468c0edffc2b47a36c74e79882da3, type: 3}
   loopGameWinBGM: 1
 --- !u!1 &1235072977
 GameObject:
@@ -44541,7 +44440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72a41d3dee6c05d42bb87d2684ee8b77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AirborneAIController
-  _airborneBehavior: 2
+  _airborneBehavior: 1
   _hasFrontObstacleDetection: 1
   _hasCeilingObstacleDetection: 1
   _hasGroundObstacleDetection: 1
@@ -44669,7 +44568,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
-  _isGrabbable: 1
   stiffness: 2000
   damping: 50
   maxForce: 1000
@@ -44860,7 +44758,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 100
+  m_Mass: 20
   m_LinearDamping: 0
   m_AngularDamping: 0
   m_GravityScale: 0
@@ -55920,7 +55818,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 8
+  m_Mass: 20
   m_LinearDamping: 0
   m_AngularDamping: 5
   m_GravityScale: 1
@@ -55963,7 +55861,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
-  _isGrabbable: 1
   stiffness: 1000
   damping: 30
   maxForce: 1000
@@ -56335,7 +56232,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
-  _isGrabbable: 1
   stiffness: 1000
   damping: 30
   maxForce: 1000

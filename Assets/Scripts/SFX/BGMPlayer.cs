@@ -5,9 +5,8 @@ using UnityEngine;
 /// </summary>
 public class BGMPlayer: MonoBehaviour {
     [SerializeField] private AudioClip mainBGM;
-    [SerializeField] private AudioClip gameWinBGM;
-
     [SerializeField] private bool loopMainBGM = true;
+    [SerializeField] private AudioClip gameWinBGM;
     [SerializeField] private bool loopGameWinBGM = true;
 
     public void PlayMainBGM() {

@@ -7,6 +7,7 @@ using UnityEngine;
 public class SFXPlayer : MonoBehaviour {
     [SerializeField, Tooltip("One or more clips; plays randomly if multiple are assigned")]
     private AudioClip[] audioClips; 
+
     public void PlaySFX() {
         if (audioClips == null || audioClips.Length == 0) { return; }
 

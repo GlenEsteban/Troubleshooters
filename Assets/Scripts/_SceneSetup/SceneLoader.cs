@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class SceneLoader : MonoBehaviour {
     private bool isLoading = false;
+
     private void Update() {
         // TEMP: INPUT FOR TESTING SCENE LOADING
         if (Input.GetKeyUp(KeyCode.R)) {
@@ -20,6 +21,7 @@ public class SceneLoader : MonoBehaviour {
     public void LoadScene(int buildIndex, float delay) {
         StartCoroutine(LoadSceneCoroutine(buildIndex, delay));
     }
+
     private IEnumerator LoadSceneCoroutine(int buildIndex, float delay) {
         if (isLoading) yield break;
         isLoading = true;
