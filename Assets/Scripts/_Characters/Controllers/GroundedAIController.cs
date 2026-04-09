@@ -56,19 +56,19 @@ public class GroundedAIController : MonoBehaviour {
         if (grabbableObject == null) { return; }
 
         grabbableObject.Grabbed -= DisableControls;
-        grabbableObject.Dropped -= EnableControls;
+        grabbableObject.Released -= EnableControls;
     }
 
     private void Start() {
         // Subscribe controller access to grabbable object events
         if (grabbableObject != null) {
             grabbableObject.Grabbed += DisableControls;
-            grabbableObject.Dropped += EnableControls;
+            grabbableObject.Released += EnableControls;
         }
 
         // Set transform as default patrol point if there are none
-        if (patrolPoints.Count == 0) {
-            patrolPoints.Add(transform);
+        if (patrolPoints == null || patrolPoints.Count == 0) {
+            patrolPoints = new List<Transform> { transform };
         }
 
         // Set first patrol point as target patrol point
@@ -84,13 +84,13 @@ public class GroundedAIController : MonoBehaviour {
 
         switch (_groundedBehavior) {
             case GroundedBehavior.None:
-                rigidBody2DMovement.MoveInDirection(Vector2.zero);
+                rigidBody2DMovement.SetMoveDirection(Vector2.zero);
                 break;
             case GroundedBehavior.SimplePatrol:
                 SimplePatrolBehavior();
                 break;
             case GroundedBehavior.AdvancePatrol:
-                AdvancePatrolBehviour();
+                AdvancePatrolBehavior();
                 break;
             case GroundedBehavior.FollowTarget:
                 FollowTargetBehavior();
@@ -104,7 +104,7 @@ public class GroundedAIController : MonoBehaviour {
         }
 
         if (rigidBody2DMovement.GetMoveDirection() == Vector2.zero) {
-            rigidBody2DMovement.MoveInDirection(startingMoveDirection);
+            rigidBody2DMovement.SetMoveDirection(startingMoveDirection);
         }
 
         if (detectionTimer > detectionRate) {
@@ -120,8 +120,8 @@ public class GroundedAIController : MonoBehaviour {
             rigidBody2DMovement.HardStopMovement();
 
             Vector2 newDirection = -rigidBody2DMovement.GetMoveDirection();
-            rigidBody2DMovement.FlipHorizontalDirection();
-            lookOrientation.SetLookOrientation(newDirection);
+            rigidBody2DMovement.SetMoveDirection(newDirection);
+            lookOrientation.SetLookDirection(newDirection);
         }
     }
 
@@ -132,12 +132,12 @@ public class GroundedAIController : MonoBehaviour {
             }
 
             Vector2 newDirection = -rigidBody2DMovement.GetMoveDirection();
-            rigidBody2DMovement.FlipHorizontalDirection();
-            lookOrientation.SetLookOrientation(newDirection);
+            rigidBody2DMovement.SetMoveDirection(newDirection);
+            lookOrientation.SetLookDirection(newDirection);
         }
     }
 
-    private void AdvancePatrolBehviour() {
+    private void AdvancePatrolBehavior() {
         float signedHorizontalDistanceToTargetPatrolPoint = targetPatrolPoint.position.x - transform.position.x;
         float horizontalDistanceToTargetPatrolPoint = Mathf.Abs(signedHorizontalDistanceToTargetPatrolPoint);
 
@@ -158,28 +158,28 @@ public class GroundedAIController : MonoBehaviour {
             }
 
             if (hasStopAtPatrolPoint) {
-                rigidBody2DMovement.MoveInDirection(Vector2.zero);
+                rigidBody2DMovement.SetMoveDirection(Vector2.zero);
             }
         }
 
         if (horizontalDistanceToTargetPatrolPoint > stoppingDistance) {
             moveDirection = signedHorizontalDistanceToTargetPatrolPoint > 0 ? Vector2.right : Vector2.left;
-            rigidBody2DMovement.MoveInDirection(moveDirection);
-            lookOrientation.SetLookOrientation(moveDirection);
+            rigidBody2DMovement.SetMoveDirection(moveDirection);
+            lookOrientation.SetLookDirection(moveDirection);
         }
 
         if (hasEdgeDetectionWhilePursuingPatrolPoint && !edgeDetection.IsTouchingLayers(groundLayers)) {
             if (rigidBody2DMovement.GetMoveDirection() == Vector2.zero) { return; }
 
             rigidBody2DMovement.HardStopMovement();
-            rigidBody2DMovement.MoveInDirection(Vector2.zero);
+            rigidBody2DMovement.SetMoveDirection(Vector2.zero);
         }
 
         if (hasObstacleDetectionWhilePursuingPatrolPoint && obstacleDetection.IsTouchingLayers(obstacleLayers)) {
             if (rigidBody2DMovement.GetMoveDirection() == Vector2.zero) { return; }
 
             rigidBody2DMovement.HardStopMovement();
-            rigidBody2DMovement.MoveInDirection(Vector2.zero);
+            rigidBody2DMovement.SetMoveDirection(Vector2.zero);
         }
     }
 
@@ -193,12 +193,12 @@ public class GroundedAIController : MonoBehaviour {
             float horizontalDistanceToTarget = Mathf.Abs(signedHorizontalDistanceToTarget);
             if (horizontalDistanceToTarget > followingDistance) {
                 moveDirection = signedHorizontalDistanceToTarget > 0 ? Vector2.right : Vector2.left;
-                rigidBody2DMovement.MoveInDirection(moveDirection);
-                lookOrientation.SetLookOrientation(moveDirection);
+                rigidBody2DMovement.SetMoveDirection(moveDirection);
+                lookOrientation.SetLookDirection(moveDirection);
             }
 
             if (hasStopAtTarget && horizontalDistanceToTarget < followingDistance) {
-                rigidBody2DMovement.MoveInDirection(Vector2.zero);
+                rigidBody2DMovement.SetMoveDirection(Vector2.zero);
             }
 
             followingTargetTimer = 0;
@@ -208,7 +208,7 @@ public class GroundedAIController : MonoBehaviour {
             if (rigidBody2DMovement.GetMoveDirection() == Vector2.zero) { return; }
             
             rigidBody2DMovement.HardStopMovement();            
-            rigidBody2DMovement.MoveInDirection(Vector2.zero);
+            rigidBody2DMovement.SetMoveDirection(Vector2.zero);
         }
     }
 

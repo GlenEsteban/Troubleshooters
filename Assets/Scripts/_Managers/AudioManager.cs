@@ -56,6 +56,7 @@ public class AudioManager : MonoBehaviour {
         if (clips == null || clips.Length == 0) { return; }
 
         int randomIndex = Random.Range(0, clips.Length);
+
         audioSource.PlayOneShot(clips[randomIndex]);
     }
 

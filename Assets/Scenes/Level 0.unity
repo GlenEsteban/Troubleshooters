@@ -779,8 +779,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 197866248}
   - {fileID: 1796927063}
-  - {fileID: 326217595}
   - {fileID: 1131216809}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -964,7 +964,7 @@ GameObject:
   - component: {fileID: 107918778}
   - component: {fileID: 107918779}
   m_Layer: 7
-  m_Name: Display Light
+  m_Name: Emotion Display Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -978,12 +978,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 107918777}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1533485073}
+  m_Father: {fileID: 1239615268}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &107918779
 MonoBehaviour:
@@ -1141,7 +1141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &170690385
 Transform:
   m_ObjectHideFlags: 0
@@ -1185,11 +1185,12 @@ GameObject:
   m_Component:
   - component: {fileID: 191114837}
   - component: {fileID: 191114843}
+  - component: {fileID: 191114844}
   - component: {fileID: 191114840}
   - component: {fileID: 191114839}
   - component: {fileID: 191114842}
   m_Layer: 6
-  m_Name: Claw Attachment
+  m_Name: 'Claw '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1204,7 +1205,7 @@ Transform:
   m_GameObject: {fileID: 191114836}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.055, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1228,7 +1229,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0.50000006}
-  m_ConnectedAnchor: {x: 0, y: -0.37000012}
+  m_ConnectedAnchor: {x: 0, y: -0.31500006}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1313,11 +1314,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e798b9e5325a774683f3bf24fbed799, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClawAttachment
-  _anchorId: 1
-  _anchorPoint: {fileID: 1577032640}
-  _accidentalDropDistance: 0.8
-  _grabbableObjectsInPickupCollider: []
-  _targetGrabbableObject: {fileID: 0}
+  anchorId: 1
+  anchorPoint: {fileID: 1577032640}
+  unintendedReleaseThreshold: 0.8
+--- !u!114 &191114844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191114836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5505cb072dbd0c840b540f64ca15509e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClawAttachmentSFX
+  clawClackOpen: {fileID: 8300000, guid: d974b8493a1e78d4995cb478d56e8249, type: 3}
+  clawClackClosed: {fileID: 8300000, guid: 81fdf165369d38a4abac17a643455ea8, type: 3}
 --- !u!1 &191828588
 GameObject:
   m_ObjectHideFlags: 0
@@ -1395,7 +1408,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 326217595}
+  m_Father: {fileID: 59027599}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &197866249
 MonoBehaviour:
@@ -1882,7 +1895,7 @@ GameObject:
   m_Component:
   - component: {fileID: 326217595}
   m_Layer: 0
-  m_Name: Systems
+  m_Name: _Systems / Resources
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1896,13 +1909,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 326217594}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 197866248}
-  m_Father: {fileID: 59027599}
+  - {fileID: 780725559}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &359151068
 GameObject:
@@ -37119,6 +37132,51 @@ Transform:
   - {fileID: 1107383679}
   m_Father: {fileID: 8416674493269540872}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &484241848
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 484241849}
+  - component: {fileID: 484241850}
+  m_Layer: 0
+  m_Name: Mouse Grabber
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &484241849
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484241848}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 780725559}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &484241850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484241848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bda059eeed7f644085b9604dd24bded, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MouseGrabber
+  cam: {fileID: 519420031}
 --- !u!1 &488336178
 GameObject:
   m_ObjectHideFlags: 0
@@ -37612,7 +37670,7 @@ AudioSource:
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
-  Mute: 1
+  Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
@@ -38223,6 +38281,51 @@ Grid:
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
+--- !u!1 &754161111
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 754161112}
+  - component: {fileID: 754161113}
+  m_Layer: 0
+  m_Name: Follow Target Mouse
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &754161112
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 754161111}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 780725559}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &754161113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 754161111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 213e3c23b661da04f8563ae62a7e79a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FollowTargetMouse
+  cam: {fileID: 519420031}
 --- !u!1 &778127246
 GameObject:
   m_ObjectHideFlags: 0
@@ -38337,6 +38440,39 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &780725558
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 780725559}
+  m_Layer: 0
+  m_Name: Debug Tools
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &780725559
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 780725558}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 484241849}
+  - {fileID: 754161112}
+  m_Father: {fileID: 326217595}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &812896304
 GameObject:
   m_ObjectHideFlags: 0
@@ -38675,7 +38811,7 @@ GameObject:
   m_Component:
   - component: {fileID: 861264425}
   m_Layer: 7
-  m_Name: Sprites
+  m_Name: Visuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39029,7 +39165,7 @@ GameObject:
   - component: {fileID: 994576068}
   - component: {fileID: 994576067}
   m_Layer: 7
-  m_Name: Body
+  m_Name: Body Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39337,7 +39473,7 @@ GameObject:
   - component: {fileID: 1111013409}
   - component: {fileID: 1111013410}
   - component: {fileID: 1111013411}
-  m_Layer: 11
+  m_Layer: 10
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39831,7 +39967,7 @@ GameObject:
   - component: {fileID: 1239615270}
   - component: {fileID: 1239615269}
   m_Layer: 14
-  m_Name: Display
+  m_Name: Emotion Display Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39849,7 +39985,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 107918778}
   m_Father: {fileID: 861264425}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &1239615269
@@ -44274,7 +44411,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1501333187}
   - component: {fileID: 1501333188}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44373,6 +44510,7 @@ GameObject:
   - component: {fileID: 1524320452}
   - component: {fileID: 1524320454}
   - component: {fileID: 1524320458}
+  - component: {fileID: 1524320459}
   m_Layer: 8
   m_Name: Flybot
   m_TagString: Untagged
@@ -44473,9 +44611,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0ee6e66512f8cd4da58c1cf0405100f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _characterSprites: {fileID: 13013520}
-  _clawAnimator: {fileID: 0}
-  _displayAnimator: {fileID: 9281556}
+  characterVisuals: {fileID: 0}
+  emotionDisplayAnimator: {fileID: 0}
 --- !u!195 &1524320452
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -44510,10 +44647,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bae91a8887ef85469bfb72ab29ee6be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _acceleration: 60
-  _deceleration: 5
-  _maxMoveSpeed: 8
-  _stoppingDistance: 0
+  acceleration: 60
+  deceleration: 5
+  maxMoveSpeed: 8
+  stoppingDistance: 1.5
 --- !u!114 &1524320455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44541,8 +44678,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ea82aa6a2e23714fa406c1a78bde726, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LookOrientation
-  _detectors: {fileID: 1999115052}
-  _attachments: {fileID: 85895834}
+  objectsToOrient:
+  - {fileID: 1999115052}
 --- !u!114 &1524320457
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44571,6 +44708,19 @@ MonoBehaviour:
   stiffness: 2000
   damping: 50
   maxForce: 1000
+--- !u!114 &1524320459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524320445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c59b9da7216bfce448a4e2f94fed28f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Emotion
+  currentEmotion: 0
 --- !u!1 &1530301446
 GameObject:
   m_ObjectHideFlags: 0
@@ -44666,17 +44816,16 @@ GameObject:
   m_Component:
   - component: {fileID: 1533485073}
   - component: {fileID: 1533485080}
-  - component: {fileID: 1533485078}
-  - component: {fileID: 1533485082}
-  - component: {fileID: 1533485074}
   - component: {fileID: 1533485075}
+  - component: {fileID: 1533485074}
   - component: {fileID: 1533485086}
-  - component: {fileID: 1533485076}
+  - component: {fileID: 1533485088}
+  - component: {fileID: 1533485082}
+  - component: {fileID: 1533485078}
   - component: {fileID: 1533485077}
-  - component: {fileID: 1533485085}
-  - component: {fileID: 1533485083}
+  - component: {fileID: 1533485076}
   - component: {fileID: 1533485084}
-  - component: {fileID: 1533485087}
+  - component: {fileID: 1533485085}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -44698,7 +44847,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 861264425}
-  - {fileID: 107918778}
   - {fileID: 701270181}
   - {fileID: 1175665185}
   - {fileID: 1970536436}
@@ -44758,7 +44906,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 20
+  m_Mass: 100
   m_LinearDamping: 0
   m_AngularDamping: 0
   m_GravityScale: 0
@@ -44785,8 +44933,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89d9f1d75ca4a0f4fa22f5ad5d7313eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 10
-  deceleration: 5
+  acceleration: 20
+  deceleration: 12
   maxMoveSpeed: 8
 --- !u!114 &1533485078
 MonoBehaviour:
@@ -44800,9 +44948,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0ee6e66512f8cd4da58c1cf0405100f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _characterSprites: {fileID: 861264425}
-  _clawAnimator: {fileID: 778127248}
-  _displayAnimator: {fileID: 1239615269}
+  characterVisuals: {fileID: 861264425}
+  emotionDisplayAnimator: {fileID: 0}
 --- !u!114 &1533485080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44815,7 +44962,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9619c495c0e3194dbd5d8ff323798d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Character
-  type: 0
+  type: 1
 --- !u!114 &1533485082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44828,24 +44975,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ea82aa6a2e23714fa406c1a78bde726, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _detectors: {fileID: 0}
-  _attachments: {fileID: 0}
---- !u!208 &1533485083
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1533485071}
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 1
-  m_CarveOnlyStationary: 0
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
+  objectsToOrient: []
 --- !u!114 &1533485084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44858,10 +44988,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bae91a8887ef85469bfb72ab29ee6be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NavMesh2DMovement
-  _acceleration: 10
-  _deceleration: 5
-  _maxMoveSpeed: 8
-  _stoppingDistance: 0.1
+  acceleration: 20
+  deceleration: 5
+  maxMoveSpeed: 8
+  stoppingDistance: 1.5
 --- !u!195 &1533485085
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -44896,7 +45026,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72a41d3dee6c05d42bb87d2684ee8b77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AirborneAIController
-  _airborneBehavior: 0
+  _airborneBehavior: 3
   _hasFrontObstacleDetection: 1
   _hasCeilingObstacleDetection: 1
   _hasGroundObstacleDetection: 1
@@ -44914,7 +45044,7 @@ MonoBehaviour:
   _stoppingDistance: 0
   _target: {fileID: 1524320446}
   _targetPatrolPoint: {fileID: 0}
---- !u!114 &1533485087
+--- !u!114 &1533485088
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -44923,10 +45053,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1533485071}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6bda059eeed7f644085b9604dd24bded, type: 3}
+  m_Script: {fileID: 11500000, guid: c59b9da7216bfce448a4e2f94fed28f5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
-  cam: {fileID: 519420031}
+  m_EditorClassIdentifier: Assembly-CSharp::Emotion
+  currentEmotion: 0
 --- !u!1 &1557472794
 GameObject:
   m_ObjectHideFlags: 0
@@ -50034,7 +50164,7 @@ GameObject:
   - component: {fileID: 1577032640}
   - component: {fileID: 1577032645}
   m_Layer: 13
-  m_Name: Pickup Collider
+  m_Name: Grab Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -50642,7 +50772,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1877847583
 Transform:
   m_ObjectHideFlags: 0
@@ -50860,8 +50990,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1970536436}
-  m_Layer: 6
-  m_Name: Attachments
+  m_Layer: 7
+  m_Name: Power Tools
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -55782,7 +55912,7 @@ GameObject:
   - component: {fileID: 2061801521}
   - component: {fileID: 2061801520}
   - component: {fileID: 2061801522}
-  m_Layer: 11
+  m_Layer: 10
   m_Name: Large Crate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55822,7 +55952,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 5
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 50d852232bef2614c8487374311a78e4, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -55861,9 +55991,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
-  stiffness: 1000
-  damping: 30
-  maxForce: 1000
+  stiffness: 5000
+  damping: 50
+  maxForce: 5000
 --- !u!1 &2086873249
 GameObject:
   m_ObjectHideFlags: 0
@@ -56106,6 +56236,7 @@ GameObject:
   - component: {fileID: 8416674493269540884}
   - component: {fileID: 8416674493269540867}
   - component: {fileID: 8416674493269540890}
+  - component: {fileID: 8416674493269540891}
   m_Layer: 8
   m_Name: Sweepbot
   m_TagString: Untagged
@@ -56181,8 +56312,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ea82aa6a2e23714fa406c1a78bde726, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LookOrientation
-  _detectors: {fileID: 461978553}
-  _attachments: {fileID: 1999811421}
+  objectsToOrient:
+  - {fileID: 461978553}
 --- !u!114 &8416674493269540887
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56195,9 +56326,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0ee6e66512f8cd4da58c1cf0405100f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpritePresenter
-  _characterSprites: {fileID: 1082160033}
-  _clawAnimator: {fileID: 0}
-  _displayAnimator: {fileID: 2015311607}
+  characterVisuals: {fileID: 0}
+  emotionDisplayAnimator: {fileID: 0}
 --- !u!195 &8416674493269540889
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -56235,6 +56365,19 @@ MonoBehaviour:
   stiffness: 1000
   damping: 30
   maxForce: 1000
+--- !u!114 &8416674493269540891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8416674493269540873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c59b9da7216bfce448a4e2f94fed28f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Emotion
+  currentEmotion: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -56244,4 +56387,5 @@ SceneRoots:
   - {fileID: 1415994996}
   - {fileID: 734034380}
   - {fileID: 359151069}
+  - {fileID: 326217595}
   - {fileID: 59027599}

@@ -13,14 +13,14 @@ TagManager:
   - UI
   - IgnoredColliders
   - Player
-  - NPC
+  - Enemy
   - Hazards
   - Ground
   - Platform
   - Item
   - Detector
   - Glow
-  - 
+  - NPC
   - 
   - 
   - 

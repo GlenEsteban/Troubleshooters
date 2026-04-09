@@ -5,9 +5,10 @@ using UnityEngine;
 /// Detects valid collision impacts and breaks the object when the impact exceeds break threshold.
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(Collider2D))]
 public class BreakableObject : MonoBehaviour {
     public event Action ObjectBroke;
+
+    public bool IsBroken => isBroken;
 
     [SerializeField, Range(0, 100)] private float minImpactSpeedToBreak = 3f;
     [SerializeField] private LayerMask validImpactLayers;
@@ -15,14 +16,13 @@ public class BreakableObject : MonoBehaviour {
 
     private bool isBroken;
 
-    public bool IsBroken => isBroken;
-
     private void OnCollisionEnter2D(Collision2D collision) {
         if (isBroken) { return; }
 
         if (!IsInLayerMask(collision.gameObject.layer, validImpactLayers)) { return; }
 
         float impactSpeed = collision.relativeVelocity.magnitude;
+
         if (impactSpeed >= minImpactSpeedToBreak) {
             Break();
         }

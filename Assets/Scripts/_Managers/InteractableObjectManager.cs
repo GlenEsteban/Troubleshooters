@@ -8,10 +8,9 @@ using UnityEngine;
 /// </summary>
 public class InteractableObjectManager : MonoBehaviour {
     public static InteractableObjectManager Instance { get; private set; }
+    public IReadOnlyList<GameObject> InteractableObjects => interactableObjects.AsReadOnly();
 
     [SerializeField] private List<GameObject> interactableObjects= new List<GameObject>();
-
-    public IReadOnlyList<GameObject> InteractableObjects => interactableObjects.AsReadOnly();
 
     private void Awake() {
         // Ensure only one instance exists

@@ -3,23 +3,18 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
-    // References
     private PlayerInput _playerInput;
     private Rigidbody2DMovement _playerMovement;
-    private SpritePresenter _playerAnimator;
-    private ClawAttachment _clawAttachment;
+    private Claw _clawAttachment;
     private LookOrientation _lookOrientation;
 
-    // GrabDrop Variables
-    private bool _isUsingClaw = false;
 
     private void Awake() {
         _playerInput = new PlayerInput();
         _lookOrientation = GetComponent<LookOrientation>();
         _playerMovement = GetComponent<Rigidbody2DMovement>();
-        _playerAnimator = GetComponent<SpritePresenter>();
 
-        _clawAttachment = GetComponentInChildren<ClawAttachment>();
+        _clawAttachment = GetComponentInChildren<Claw>();
     }
 
     private void OnEnable() {
@@ -43,26 +38,13 @@ public class PlayerController : MonoBehaviour {
     private void Move(InputAction.CallbackContext context) {
         Vector2 moveDirection = context.ReadValue<Vector2>();
 
-        _playerMovement.MoveInDirection(moveDirection);
-        _lookOrientation.SetLookOrientation(moveDirection);
+        _playerMovement.SetMoveDirection(moveDirection);
+        _lookOrientation.SetLookDirection(moveDirection);
     }
 
     private void GrabDrop(InputAction.CallbackContext context) {
         if (context.phase == InputActionPhase.Performed) {
-            TogglClawUse();
-        }
-    }
-
-    public void TogglClawUse() {
-        _isUsingClaw = !_isUsingClaw;
-
-        _playerAnimator.SetClawAnimation(_isUsingClaw);
-
-        if (_isUsingClaw) {
-            _clawAttachment.Grab();
-        }
-        else {
-            _clawAttachment.Drop();
+            _clawAttachment.Use();
         }
     }
 }

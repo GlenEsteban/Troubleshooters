@@ -9,7 +9,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class GrabbableObject : MonoBehaviour {
     public event Action Grabbed;
-    public event Action Dropped;
+    public event Action Released;
 
     [SerializeField] private float stiffness = 1000f;
     [SerializeField] private float damping = 30f;
@@ -24,7 +24,7 @@ public class GrabbableObject : MonoBehaviour {
 
     private Rigidbody2D rb;
 
-    public Vector2 GetWorldAnchorPoint(int anchorId) {
+    public Vector2 GetAnchorWorldPosition(int anchorId) {
         return transform.TransformPoint(anchorPoints[anchorId].anchorLocalPosition);
     }
 
@@ -33,19 +33,23 @@ public class GrabbableObject : MonoBehaviour {
     }
 
     private void FixedUpdate() {
-        HandleRigidbody2DForcesForEachAnchorPoint();
+        ApplyForcesAtAnchors();
     }
-    private void HandleRigidbody2DForcesForEachAnchorPoint() {
+
+    /// <summary>
+    /// Applies spring and damping forces at each anchor point,
+    /// pulling them toward their target positions while reducing oscillation.
+    /// </summary>
+    private void ApplyForcesAtAnchors() {
         foreach (AnchorPoint anchorPoint in anchorPoints.Values) {
             Vector2 anchorWorldPosition = transform.TransformPoint(anchorPoint.anchorLocalPosition);
+            Vector2 anchorVelocity = rb.GetPointVelocity(anchorWorldPosition);
+            Vector2 anchorToTargetDisplacement = anchorPoint.targetWorldPosition - anchorWorldPosition;
 
-            Vector2 anchorPointVelocity = rb.GetPointVelocity(anchorWorldPosition);
-            Vector2 directionToTarget = anchorPoint.targetWorldPosition - anchorWorldPosition;
+            Vector2 stiffnessForce = anchorToTargetDisplacement * stiffness;
+            Vector2 dampingForce = anchorVelocity * damping;
 
-            Vector2 pullTowardTarget = directionToTarget * stiffness;
-            Vector2 resistanceToMotion = anchorPointVelocity * damping;
-
-            Vector2 force = pullTowardTarget - resistanceToMotion;
+            Vector2 force = stiffnessForce - dampingForce;
 
             force = Vector2.ClampMagnitude(force, maxForce);
 
@@ -66,7 +70,7 @@ public class GrabbableObject : MonoBehaviour {
         };
     }
 
-    public void UpdateAnchorPointPosition(int id, Vector2 worldPos) {
+    public void UpdateAnchorTargetWorldPosition(int id, Vector2 worldPos) {
         if (anchorPoints.TryGetValue(id, out AnchorPoint anchorPoint)) {
             anchorPoint.targetWorldPosition = worldPos;
         }
@@ -76,7 +80,7 @@ public class GrabbableObject : MonoBehaviour {
         anchorPoints.Remove(id);
 
         if (anchorPoints.Count == 0) {
-            Dropped?.Invoke();
+            Released?.Invoke();
         }
     }
 }

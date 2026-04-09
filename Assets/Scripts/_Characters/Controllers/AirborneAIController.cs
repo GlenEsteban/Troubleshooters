@@ -48,13 +48,13 @@ public class AirborneAIController : MonoBehaviour {
         if (_grabbableObject == null) { return; }
 
         _grabbableObject.Grabbed -= DisableControls;
-        _grabbableObject.Dropped -= EnableControls;
+        _grabbableObject.Released -= EnableControls;
     }
     void Start() {
         // Subscribe controller access to grabbable object events
         if (_grabbableObject != null) {
             _grabbableObject.Grabbed += DisableControls;
-            _grabbableObject.Dropped += EnableControls;
+            _grabbableObject.Released += EnableControls;
         }
 
         // Set transform as default patrol point if there are none
@@ -70,7 +70,7 @@ public class AirborneAIController : MonoBehaviour {
     private void Update() {
         switch (_airborneBehavior) {
             case AirborneBehavior.None:
-                _rigidBody2DMovement.MoveInDirection(Vector2.zero);
+                _rigidBody2DMovement.SetMoveDirection(Vector2.zero);
                 break;
             case AirborneBehavior.SimplePatrol:
                 SimplePatrolBehavior();
@@ -85,10 +85,11 @@ public class AirborneAIController : MonoBehaviour {
     }
 
     private void SimplePatrolBehavior() {
-        _navMeshRigidbody2DMovement.StopMovement();
+        _navMeshRigidbody2DMovement.SetCanMove(false);
+        _rigidBody2DMovement.SetCanMove(true);
 
         if (_rigidBody2DMovement.GetMoveDirection() == Vector2.zero ) {
-            _rigidBody2DMovement.MoveInDirection( _startingMoveDirection);
+            _rigidBody2DMovement.SetMoveDirection( _startingMoveDirection);
         }
 
         _detectionTimer += Time.deltaTime;
@@ -108,8 +109,8 @@ public class AirborneAIController : MonoBehaviour {
             Vector2 currentMoveDirection = _rigidBody2DMovement.GetMoveDirection();
             Vector2 reflectedMoveDirection = new Vector2(-currentMoveDirection.x, currentMoveDirection.y);
 
-            _rigidBody2DMovement.MoveInDirection(reflectedMoveDirection);
-            _lookOrientation.SetLookOrientation(reflectedMoveDirection);
+            _rigidBody2DMovement.SetMoveDirection(reflectedMoveDirection);
+            _lookOrientation.SetLookDirection(reflectedMoveDirection);
         }
 
         if (_hasCeilingObstacleDetection && _ceilingObstacleDetector.IsTouchingLayers(_obstacleLayers)) {
@@ -120,8 +121,8 @@ public class AirborneAIController : MonoBehaviour {
             Vector2 currentMoveDirection = _rigidBody2DMovement.GetMoveDirection();
             Vector2 reflectedMoveDirection = new Vector2 (currentMoveDirection.x, - Math.Abs(currentMoveDirection.y));
 
-            _rigidBody2DMovement.MoveInDirection(reflectedMoveDirection);
-            _lookOrientation.SetLookOrientation(reflectedMoveDirection);
+            _rigidBody2DMovement.SetMoveDirection(reflectedMoveDirection);
+            _lookOrientation.SetLookDirection(reflectedMoveDirection);
         }  
 
         if (_hasGroundObstacleDetection && _groundObstacleDetector.IsTouchingLayers(_obstacleLayers)) {
@@ -132,14 +133,15 @@ public class AirborneAIController : MonoBehaviour {
             Vector2 currentMoveDirection = _rigidBody2DMovement.GetMoveDirection();
             Vector2 reflectedMoveDirection = new Vector2(currentMoveDirection.x, Math.Abs(currentMoveDirection.y));
 
-            _rigidBody2DMovement.MoveInDirection(reflectedMoveDirection);
-            _lookOrientation.SetLookOrientation(reflectedMoveDirection);
+            _rigidBody2DMovement.SetMoveDirection(reflectedMoveDirection);
+            _lookOrientation.SetLookDirection(reflectedMoveDirection);
         }
     }
 
     private void AdvancePatrolBehviour() {
-        _rigidBody2DMovement.StopMovement();
-         
+        _rigidBody2DMovement.SetCanMove(false);
+        _navMeshRigidbody2DMovement.SetCanMove(true);
+
         float distanceFromPatrolPoint = Vector2.Distance((Vector2) _targetPatrolPoint.position, (Vector2) transform.position);
         if (distanceFromPatrolPoint <= _stoppingDistance) {
             _waitAtPatrolPointTimer += Time.deltaTime;
@@ -159,16 +161,17 @@ public class AirborneAIController : MonoBehaviour {
         }
 
         _navMeshRigidbody2DMovement.MoveToTarget(_targetPatrolPoint.position);
-        _lookOrientation.SetLookOrientation(_navMeshRigidbody2DMovement.GetCurrentMoveDirection());
+        _lookOrientation.SetLookDirection(_navMeshRigidbody2DMovement.GetMoveDirection());
     }
 
     private void FollowTargetBehavior() {
-        _rigidBody2DMovement.StopMovement();
+        _rigidBody2DMovement.SetCanMove(false);
+        _navMeshRigidbody2DMovement.SetCanMove(true);
 
         _navMeshRigidbody2DMovement.MoveToTarget(_target.position);
 
         Vector2 selfToTargetDirection = (_target.position - transform.position).normalized;
-        _lookOrientation.SetLookOrientation(selfToTargetDirection);
+        _lookOrientation.SetLookDirection(selfToTargetDirection);
     }
 
     public void EnableControls() {

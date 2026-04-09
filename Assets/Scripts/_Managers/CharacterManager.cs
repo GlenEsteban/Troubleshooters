@@ -9,13 +9,13 @@ using UnityEngine;
 public class CharacterManager : MonoBehaviour {
     public static CharacterManager Instance { get; private set; }
 
+    public IReadOnlyList<Character> Players => players.AsReadOnly();
+    public IReadOnlyList<Character> Enemies => enemies.AsReadOnly();
+    public IReadOnlyList<Character> NPCs => npcs.AsReadOnly();
+
     [SerializeField] private List<Character> players = new List<Character>();
     [SerializeField] private List<Character> enemies = new List<Character>();
     [SerializeField] private List<Character> npcs = new List<Character>();
-
-    public IReadOnlyList<Character> Followers => players.AsReadOnly();
-    public IReadOnlyList<Character> Enemies => enemies.AsReadOnly();
-    public IReadOnlyList<Character> NPCs => npcs.AsReadOnly();
 
     private void Awake() {
         // Ensure only one instance exists

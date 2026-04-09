@@ -8,6 +8,8 @@ using UnityEngine;
 public class GameStateManager : MonoBehaviour {
     public static GameStateManager Instance { get; private set; }
 
+    public GameState CurrentGameState => currentGameState;
+
     [SerializeField] private SceneLoader sceneLoader;
     [SerializeField] private BGMPlayer bgmPlayer; 
     [SerializeField] private PlayerController playerController;
@@ -18,8 +20,6 @@ public class GameStateManager : MonoBehaviour {
     private bool hasStartedLevel = false;
 
     private GameState currentGameState = GameState.None;
-
-    public GameState CurrentGameState => currentGameState;
 
     private void Awake() {
         // Ensure only one instance exists

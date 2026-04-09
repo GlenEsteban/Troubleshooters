@@ -22,6 +22,10 @@ public class SceneLoader : MonoBehaviour {
         StartCoroutine(LoadSceneCoroutine(buildIndex, delay));
     }
 
+    /// <summary>
+    /// Waits for a delay, then loads the scene with the given build index if it is valid.
+    /// Prevents multiple scene loads from starting at the same time.
+    /// </summary>
     private IEnumerator LoadSceneCoroutine(int buildIndex, float delay) {
         if (isLoading) yield break;
         isLoading = true;
@@ -39,6 +43,7 @@ public class SceneLoader : MonoBehaviour {
 
     public void ReloadScene(float delay) {
         int currentSceneBuildIndex = SceneManager.GetActiveScene().buildIndex;
+
         LoadScene(currentSceneBuildIndex, delay);
     }
 
