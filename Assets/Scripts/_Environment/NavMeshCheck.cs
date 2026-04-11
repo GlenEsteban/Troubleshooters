@@ -5,11 +5,11 @@ using UnityEngine;
 /// Makeshift solution to enable NavMesh Surface component when game starts.
 /// </summary>
 public class NavMeshCheck : MonoBehaviour {
-    private NavMeshSurface _navMeshSurface;
+    private NavMeshSurface navMeshSurface;
 
     private void Awake() {
-        _navMeshSurface = GetComponent<NavMeshSurface>();
+        navMeshSurface = GetComponent<NavMeshSurface>();
 
-        _navMeshSurface.enabled = true;
+        navMeshSurface.enabled = true;
     }
 }

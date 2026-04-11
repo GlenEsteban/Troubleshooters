@@ -11,6 +11,7 @@ using UnityEngine.AI;
 public class NavMeshRigidbody2DMovement : MonoBehaviour {
     public bool CanMove => canMove;
 
+    [Header("Movement")]
     [SerializeField, Range(1f, 100f)] private float acceleration = 20f;
     [SerializeField, Range(1f, 100f)] private float deceleration = 12f;
     [SerializeField, Range(1f, 100f)] private float maxMoveSpeed = 10f;

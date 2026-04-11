@@ -3,24 +3,25 @@ using UnityEngine;
 /// <summary>
 /// Plays claw sound effects in response to grab and release events.
 /// </summary>
-[RequireComponent(typeof(Claw))]
-public class ClawSFX : MonoBehaviour {
+[RequireComponent(typeof(ClawAttachment))]
+public class ClawAttachmentSFX : MonoBehaviour {
+    [Header("Claw Sound Effects")]
     [SerializeField] private AudioClip clawClackOpen;
     [SerializeField] private AudioClip clawClackClosed;
 
-    private Claw claw;
+    private ClawAttachment clawAttachment;
 
     private void Awake() {
-        claw = GetComponent<Claw>();
+        clawAttachment = GetComponent<ClawAttachment>();
     }
     private void OnEnable() {
-        claw.ClawClosed += PlayClawClackClosed;
-        claw.ClawOpened += PlayClawClackOpen;
+        clawAttachment.ClawClosed += PlayClawClackClosed;
+        clawAttachment.ClawOpened += PlayClawClackOpen;
     }
 
     private void OnDisable() {
-        claw.ClawClosed -= PlayClawClackClosed;
-        claw.ClawOpened -= PlayClawClackOpen;
+        clawAttachment.ClawClosed -= PlayClawClackClosed;
+        clawAttachment.ClawOpened -= PlayClawClackOpen;
     }
 
     public void PlayClawClackOpen() {

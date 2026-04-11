@@ -5,9 +5,12 @@ using UnityEngine;
 /// with the CharacterManager.
 /// </summary>
 public class Character : MonoBehaviour {
-    public CharacterType Type => type;
+    public CharacterType Type => characterType;
+    public string Name => characterName;
 
-    [SerializeField] private CharacterType type;
+    [Header("Character Info")]
+    [SerializeField] private CharacterType characterType;
+    [SerializeField] private string characterName;
 
     private void OnEnable() {
         CharacterManager.Instance.RegisterCharacter(this);

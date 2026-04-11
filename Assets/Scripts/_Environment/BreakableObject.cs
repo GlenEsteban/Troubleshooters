@@ -10,8 +10,11 @@ public class BreakableObject : MonoBehaviour {
 
     public bool IsBroken => isBroken;
 
+    [Header("Break Condition")]
     [SerializeField, Range(0, 100)] private float minImpactSpeedToBreak = 3f;
     [SerializeField] private LayerMask validImpactLayers;
+
+    [Header("Break Visual Effects")]
     [SerializeField] private ParticleSystem shatterParticles;
 
     private bool isBroken;

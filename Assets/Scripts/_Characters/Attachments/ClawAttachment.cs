@@ -7,15 +7,18 @@ using UnityEngine;
 /// Detects nearby targets, grabs and anchors to one, maintains the connection,
 /// and releases either manually or when the connection exceeds a distance threshold.
 /// </summary>
-public class Claw : PowerTool{
+public class ClawAttachment : Attachment{
     public event Action ClawClosed;
     public event Action ClawOpened;
-    public event Action Grabbed;
-    public event Action Released;
+    public event Action GrabbedObject;
+    public event Action ReleasedObject;
     public event Action UnintentionallyReleased;
 
+    [Header("Anchor")]
     [SerializeField] private int anchorId;
     [SerializeField] private Transform anchorPoint;
+
+    [Header("Release")]
     [SerializeField] private float unintendedReleaseThreshold = 0.8f;
 
     private List<GrabbableObject> grabbableObjectsInRange = new List<GrabbableObject>();
@@ -76,7 +79,7 @@ public class Claw : PowerTool{
         targetGrabbableObject = grabbableObjectsInRange[0];
         targetGrabbableObject.AddAnchorPoint(anchorId, anchorPoint.position);
 
-        Grabbed?.Invoke();
+        GrabbedObject?.Invoke();
     }
 
     private void Release() {
@@ -87,7 +90,7 @@ public class Claw : PowerTool{
         targetGrabbableObject.RemoveAnchorPoint(anchorId);
         targetGrabbableObject = null;
 
-        Released?.Invoke();
+        ReleasedObject?.Invoke();
     }
 
     private void UnintendedRelease() {

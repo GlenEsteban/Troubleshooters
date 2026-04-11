@@ -1189,6 +1189,7 @@ GameObject:
   - component: {fileID: 191114840}
   - component: {fileID: 191114839}
   - component: {fileID: 191114842}
+  - component: {fileID: 191114845}
   m_Layer: 6
   m_Name: 'Claw '
   m_TagString: Untagged
@@ -1331,6 +1332,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClawAttachmentSFX
   clawClackOpen: {fileID: 8300000, guid: d974b8493a1e78d4995cb478d56e8249, type: 3}
   clawClackClosed: {fileID: 8300000, guid: 81fdf165369d38a4abac17a643455ea8, type: 3}
+--- !u!114 &191114845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191114836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df98870bb8df05a449fdcb14af15669e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClawAttachment
+  anchorId: 0
+  anchorPoint: {fileID: 0}
+  unintendedReleaseThreshold: 0.8
 --- !u!1 &191828588
 GameObject:
   m_ObjectHideFlags: 0
@@ -1375,9 +1391,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d04f2e2db2322274d999f7e798c75f34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  players: []
-  enemies: []
-  npcs: []
+  playerCharacters: []
+  enemyCharacters: []
+  npcCharacters: []
 --- !u!1 &197866247
 GameObject:
   m_ObjectHideFlags: 0
@@ -37997,7 +38013,7 @@ GameObject:
   m_Component:
   - component: {fileID: 629422270}
   m_Layer: 7
-  m_Name: Enemies
+  m_Name: Enemy Characters
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -38485,7 +38501,7 @@ GameObject:
   - component: {fileID: 812896307}
   - component: {fileID: 812896306}
   m_Layer: 8
-  m_Name: Body
+  m_Name: Body Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39361,7 +39377,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1082160033}
   m_Layer: 8
-  m_Name: Sprites
+  m_Name: Visuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39896,12 +39912,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1235072977}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8416674493269540872}
+  m_Father: {fileID: 2015311606}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1235072979
 MonoBehaviour:
@@ -40173,7 +40189,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1265674285}
   m_Layer: 7
-  m_Name: Players
+  m_Name: Player Characters
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44692,7 +44708,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9619c495c0e3194dbd5d8ff323798d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Character
-  type: 2
+  characterType: 0
+  characterName: 
 --- !u!114 &1524320458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44826,6 +44843,7 @@ GameObject:
   - component: {fileID: 1533485076}
   - component: {fileID: 1533485084}
   - component: {fileID: 1533485085}
+  - component: {fileID: 1533485089}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -44962,7 +44980,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9619c495c0e3194dbd5d8ff323798d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Character
-  type: 1
+  characterType: 0
+  characterName: 
 --- !u!114 &1533485082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45057,6 +45076,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Emotion
   currentEmotion: 0
+--- !u!114 &1533485089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1533485071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c03c1d91747d74b4685abad012de0e99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GroundedAIBehaviorAdvancePatrol
+  groundDetection: {fileID: 0}
+  groundLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  patrolPoints: []
+  useHardStopAtPatrolPoint: 1
+  waitTimeAtPatrolPoint: 3
+  stoppingDistance: 1
+  detectionInterval: 0.1
+  useEdgeDetection: 1
+  edgeDetection: {fileID: 0}
+  useObstacleDetection: 1
+  obstacleDetection: {fileID: 0}
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1 &1557472794
 GameObject:
   m_ObjectHideFlags: 0
@@ -50767,12 +50814,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1877847583}
   m_Layer: 7
-  m_Name: NPCs
+  m_Name: NPC Characters
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1877847583
 Transform:
   m_ObjectHideFlags: 0
@@ -50991,7 +51038,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1970536436}
   m_Layer: 7
-  m_Name: Power Tools
+  m_Name: Attachments
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -51125,7 +51172,7 @@ GameObject:
   - component: {fileID: 2015311608}
   - component: {fileID: 2015311607}
   m_Layer: 8
-  m_Name: Display
+  m_Name: Emotion Display Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -51143,7 +51190,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1235072978}
   m_Father: {fileID: 1082160033}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &2015311607
@@ -56169,35 +56217,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33e72b5aae207674796ed6bd8797a3fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _groundedBehavior: 1
-  hasEdgeDetection: 1
-  hasObstacleDetection: 1
-  hasHardStopOnObstacleDetection: 1
+  currentBehavior: {fileID: 8416674493269540892}
+  obstacleDetection: {fileID: 26901123}
+  groundDetection: {fileID: 457400138}
+  edgeDetection: {fileID: 1107383680}
   groundLayers:
     serializedVersion: 2
     m_Bits: 7552
   obstacleLayers:
     serializedVersion: 2
     m_Bits: 5504
-  obstacleDetection: {fileID: 26901123}
-  groundDetection: {fileID: 457400138}
-  edgeDetection: {fileID: 1107383680}
-  startingMoveDirection: {x: 1, y: 0}
-  detectionRate: 0.1
-  hasStopAtPatrolPoint: 1
-  hasEdgeDetectionWhilePursuingPatrolPoint: 1
-  hasObstacleDetectionWhilePursuingPatrolPoint: 1
-  patrolPoints:
-  - {fileID: 1524320446}
-  - {fileID: 1533485073}
-  waitTimeAtPatrolPoint: 3
-  stoppingDistance: 1
   hasStopAtTarget: 1
   hasEdgeDetectionWhileFollowingTarget: 1
   target: {fileID: 0}
   targetingRatePerSec: 0.1
   followingDistance: 1
-  targetPatrolPoint: {fileID: 0}
 --- !u!4 &8416674493269540872
 Transform:
   m_ObjectHideFlags: 0
@@ -56212,7 +56246,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1082160033}
-  - {fileID: 1235072978}
   - {fileID: 840416013}
   - {fileID: 461978553}
   - {fileID: 1999811421}
@@ -56228,6 +56261,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8416674493269540872}
   - component: {fileID: 8416674493269540885}
+  - component: {fileID: 8416674493269540891}
   - component: {fileID: 8416674493269540887}
   - component: {fileID: 8416674493269540886}
   - component: {fileID: 8416674493269540876}
@@ -56236,7 +56270,7 @@ GameObject:
   - component: {fileID: 8416674493269540884}
   - component: {fileID: 8416674493269540867}
   - component: {fileID: 8416674493269540890}
-  - component: {fileID: 8416674493269540891}
+  - component: {fileID: 8416674493269540892}
   m_Layer: 8
   m_Name: Sweepbot
   m_TagString: Untagged
@@ -56299,7 +56333,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9619c495c0e3194dbd5d8ff323798d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Character
-  type: 2
+  characterType: 0
+  characterName: 
 --- !u!114 &8416674493269540886
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56326,7 +56361,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0ee6e66512f8cd4da58c1cf0405100f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpritePresenter
-  characterVisuals: {fileID: 0}
+  characterVisuals: {fileID: 1082160033}
   emotionDisplayAnimator: {fileID: 0}
 --- !u!195 &8416674493269540889
 NavMeshAgent:
@@ -56378,6 +56413,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Emotion
   currentEmotion: 0
+--- !u!114 &8416674493269540892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8416674493269540873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d23b5f67eb15e44eae8f0834d778525, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SimplePatrol
+  groundDetection: {fileID: 457400138}
+  groundLayers:
+    serializedVersion: 2
+    m_Bits: 40320
+  startingMoveDirection: {x: -1, y: 0}
+  useHardStopOnTurnAround: 1
+  detectionInterval: 0.1
+  useEdgeDetection: 1
+  edgeDetection: {fileID: 1107383680}
+  useObstacleDetection: 1
+  obstacleDetection: {fileID: 26901123}
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 40320
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -6,6 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(LookOrientation))]
 [RequireComponent(typeof(Emotion))]
 public class CharacterVisuals : MonoBehaviour {
+    [Header("Visual Components")]
     [SerializeField] private Transform characterVisuals;
     [SerializeField] private Animator emotionDisplayAnimator;
 

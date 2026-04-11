@@ -9,13 +9,14 @@ using UnityEngine;
 public class CharacterManager : MonoBehaviour {
     public static CharacterManager Instance { get; private set; }
 
-    public IReadOnlyList<Character> Players => players.AsReadOnly();
-    public IReadOnlyList<Character> Enemies => enemies.AsReadOnly();
-    public IReadOnlyList<Character> NPCs => npcs.AsReadOnly();
+    public IReadOnlyList<Character> PlayerCharacters => playerCharacters.AsReadOnly();
+    public IReadOnlyList<Character> EnemyCharacters => enemyCharacters.AsReadOnly();
+    public IReadOnlyList<Character> NPCCharacters => npcCharacters.AsReadOnly();
 
-    [SerializeField] private List<Character> players = new List<Character>();
-    [SerializeField] private List<Character> enemies = new List<Character>();
-    [SerializeField] private List<Character> npcs = new List<Character>();
+    [Header("Characters")]
+    [SerializeField] private List<Character> playerCharacters = new List<Character>();
+    [SerializeField] private List<Character> enemyCharacters = new List<Character>();
+    [SerializeField] private List<Character> npcCharacters = new List<Character>();
 
     private void Awake() {
         // Ensure only one instance exists
@@ -33,18 +34,18 @@ public class CharacterManager : MonoBehaviour {
     public void RegisterCharacter(Character character) {
         switch (character.Type) {
             case CharacterType.Player:
-                if (!players.Contains(character)) {
-                    players.Add(character);
+                if (!playerCharacters.Contains(character)) {
+                    playerCharacters.Add(character);
                 }
                 break;
             case CharacterType.Enemy:
-                if (!enemies.Contains(character)) {
-                    enemies.Add(character);
+                if (!enemyCharacters.Contains(character)) {
+                    enemyCharacters.Add(character);
                 }
                 break;
             case CharacterType.NPC:
-                if (!npcs.Contains(character)) {
-                    npcs.Add(character);
+                if (!npcCharacters.Contains(character)) {
+                    npcCharacters.Add(character);
                 }
                 break;
             case CharacterType.None:
@@ -58,18 +59,18 @@ public class CharacterManager : MonoBehaviour {
     public void RemoveCharacter(Character character) {
         switch (character.Type) {
             case CharacterType.Player:
-                if (!players.Contains(character)) {
-                    players.Remove(character);
+                if (!playerCharacters.Contains(character)) {
+                    playerCharacters.Remove(character);
                 }
                 break;
             case CharacterType.Enemy:
-                if (!enemies.Contains(character)) {
-                    enemies.Remove(character);
+                if (!enemyCharacters.Contains(character)) {
+                    enemyCharacters.Remove(character);
                 }
                 break;
             case CharacterType.NPC:
-                if (!npcs.Contains(character)) {
-                    npcs.Remove(character);
+                if (!npcCharacters.Contains(character)) {
+                    npcCharacters.Remove(character);
                 }
                 break;
             case CharacterType.None:

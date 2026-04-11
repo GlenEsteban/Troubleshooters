@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class Rigidbody2DMovement : MonoBehaviour {
+    [Header("Movement")]
     [Range(1f, 100f), SerializeField] float acceleration = 20f;
     [Range(1f, 100f), SerializeField] float deceleration = 12f;
     [Range(1f, 100f), SerializeField] float maxMoveSpeed = 10f;

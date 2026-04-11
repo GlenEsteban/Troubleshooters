@@ -5,16 +5,15 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour {
     private PlayerInput _playerInput;
     private Rigidbody2DMovement _playerMovement;
-    private Claw _clawAttachment;
+    private ClawAttachment _clawAttachment;
     private LookOrientation _lookOrientation;
-
 
     private void Awake() {
         _playerInput = new PlayerInput();
         _lookOrientation = GetComponent<LookOrientation>();
         _playerMovement = GetComponent<Rigidbody2DMovement>();
 
-        _clawAttachment = GetComponentInChildren<Claw>();
+        _clawAttachment = GetComponentInChildren<ClawAttachment>();
     }
 
     private void OnEnable() {

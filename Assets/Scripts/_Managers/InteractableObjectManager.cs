@@ -10,6 +10,7 @@ public class InteractableObjectManager : MonoBehaviour {
     public static InteractableObjectManager Instance { get; private set; }
     public IReadOnlyList<GameObject> InteractableObjects => interactableObjects.AsReadOnly();
 
+    [Header("Interactable Objects")]
     [SerializeField] private List<GameObject> interactableObjects= new List<GameObject>();
 
     private void Awake() {

@@ -4,10 +4,11 @@ using UnityEngine;
 /// Debug tool that enables mouse grab functionality.
 /// </summary>
 public class MouseGrabber : MonoBehaviour {
-    public Camera cam;
+    [SerializeField] private Camera cam;
+
     private GrabbableObject grabbedObject;
 
-    private int pinchId = 0; 
+    private int anchorID = 0; 
 
     void Update() {
         // TEMP: INPUT FOR TESTING GRAB FUNCTIONALITY
@@ -18,7 +19,7 @@ public class MouseGrabber : MonoBehaviour {
         }
 
         if (Input.GetMouseButton(0) && grabbedObject != null) {
-            grabbedObject.UpdateAnchorTargetWorldPosition(pinchId, mouseWorldPosition);
+            grabbedObject.UpdateAnchorTargetWorldPosition(anchorID, mouseWorldPosition);
         }
 
         if (Input.GetMouseButtonUp(0)) {
@@ -40,14 +41,14 @@ public class MouseGrabber : MonoBehaviour {
             if (grabbable == null) { continue; }
 
             grabbedObject = grabbable;
-            grabbedObject.AddAnchorPoint(pinchId, worldPos);
+            grabbedObject.AddAnchorPoint(anchorID, worldPos);
         }
     }
 
     void Release() {
         if (grabbedObject == null) { return; }
 
-        grabbedObject.RemoveAnchorPoint(pinchId);
+        grabbedObject.RemoveAnchorPoint(anchorID);
         grabbedObject = null;        
     }
 }

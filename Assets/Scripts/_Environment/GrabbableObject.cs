@@ -11,18 +11,18 @@ public class GrabbableObject : MonoBehaviour {
     public event Action Grabbed;
     public event Action Released;
 
-    [SerializeField] private float stiffness = 1000f;
-    [SerializeField] private float damping = 30f;
-    [SerializeField] private float maxForce = 1000f;
+    [Header("Spring-Damper System")]
+    [SerializeField, Range(0f, 5000f)] private float stiffness = 1000f;
+    [SerializeField, Range(0f, 5000f)] private float damping = 30f;
+    [SerializeField, Range(0f, 5000f)] private float maxForce = 1000f;
 
+    private Rigidbody2D rb;
     private class AnchorPoint {
         public Vector2 anchorLocalPosition;
         public Vector2 targetWorldPosition;
     }
 
     private readonly Dictionary<int, AnchorPoint> anchorPoints = new Dictionary<int, AnchorPoint>();
-
-    private Rigidbody2D rb;
 
     public Vector2 GetAnchorWorldPosition(int anchorId) {
         return transform.TransformPoint(anchorPoints[anchorId].anchorLocalPosition);
