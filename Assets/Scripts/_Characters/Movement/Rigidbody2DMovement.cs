@@ -53,10 +53,6 @@ public class Rigidbody2DMovement : MonoBehaviour {
         rb.linearVelocity = Vector2.MoveTowards(rb.linearVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
     }
 
-    public void FlipHorizontalDirection() {
-        moveDirection.x = -moveDirection.x;
-    }
-
     public void HardStopMovement() {
         rb.linearVelocity = Vector2.zero;
     }

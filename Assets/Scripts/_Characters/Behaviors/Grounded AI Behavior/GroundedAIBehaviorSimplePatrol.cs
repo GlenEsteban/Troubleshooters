@@ -1,18 +1,24 @@
 using UnityEngine;
 
 /// <summary>
-/// Implements grounded patrol behavior that moves the character along the ground
-/// and reverses direction when edges or obstacles are detected.
+/// Patrols along the ground and optionally uses edge and obstacle detection to turn around.
 /// </summary>
 [RequireComponent(typeof(LookOrientation))]
 [RequireComponent(typeof(Rigidbody2DMovement))]
-public class GroundedAIBehaviorSimplePatrol : GroundedAIBehavior {
+public class GroundedAIBehaviorSimplePatrol : AIBehavior {
+    public override bool RequiresLookOrientation => true;
+    public override bool RequiresRigidbody2DMovement => true;
+
     [Header("Movement")]
     [SerializeField] private Vector2 startingMoveDirection = Vector2.right;
     [SerializeField] private bool useHardStopOnTurnAround = true;
 
     [Header("Detection Timing")]
     [SerializeField, Range(0.01f, 1f)] private float detectionInterval = 0.1f;
+
+    [Header("Ground Detection")]
+    [SerializeField] private Collider2D groundDetection;
+    [SerializeField] private LayerMask groundLayers;
 
     [Header("Edge Detection")]
     [SerializeField] private bool useEdgeDetection = true;
@@ -41,16 +47,21 @@ public class GroundedAIBehaviorSimplePatrol : GroundedAIBehavior {
     }
 
     public override void UpdateBehavior() {
-        if (CheckIfGrounded()) {
-            detectionTimer += Time.deltaTime;
+        if (!CheckIfGrounded()) { return; }
 
-            if (detectionTimer > detectionInterval) {
-                TurnAroundAtEdge();
-                TurnAroundAtObstacle();
+        detectionTimer += Time.deltaTime;
 
-                detectionTimer = 0;
-            }
+        if (detectionTimer >= detectionInterval) {
+            TurnAroundAtEdge();
+            TurnAroundAtObstacle();
+
+            detectionTimer = 0f;
         }
+    }
+    private bool CheckIfGrounded() {
+        if (groundDetection == null) { return false; }
+
+        return groundDetection.IsTouchingLayers(groundLayers);
     }
 
     private void TurnAroundAtEdge() {
