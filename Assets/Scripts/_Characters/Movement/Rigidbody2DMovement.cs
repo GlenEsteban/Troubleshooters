@@ -6,6 +6,8 @@ using UnityEngine;
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class Rigidbody2DMovement : MonoBehaviour {
+    public Vector2 MoveDirection => moveDirection;
+
     [Header("Movement")]
     [Range(1f, 100f), SerializeField] float acceleration = 20f;
     [Range(1f, 100f), SerializeField] float deceleration = 12f;
@@ -17,17 +19,14 @@ public class Rigidbody2DMovement : MonoBehaviour {
 
     private Vector2 moveDirection;
 
-    private const float MIN_MOVE_THRESHOLD = 0.0001f;
+    private const float MIN_MOVE_THRESHOLD = 0.001f;
 
     public void SetCanMove(bool state) {
         canMove = state;
     }
+
     public void SetMoveDirection(Vector2 direction) {
         moveDirection = direction.normalized;
-    }
-
-    public Vector2 GetMoveDirection() {
-        return moveDirection;
     }
 
     private void Awake() {
@@ -53,7 +52,11 @@ public class Rigidbody2DMovement : MonoBehaviour {
         rb.linearVelocity = Vector2.MoveTowards(rb.linearVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
     }
 
-    public void HardStopMovement() {
+    public void HardStopVelocity() {
         rb.linearVelocity = Vector2.zero;
+    }
+
+    public void StopMovement() {
+        SetMoveDirection(Vector2.zero);
     }
 }

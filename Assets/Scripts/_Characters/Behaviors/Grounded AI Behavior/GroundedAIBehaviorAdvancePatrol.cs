@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Moves along the ground between patrol points in sequence 
-/// and optionally uses edge and obstacle detection to restrict movement.
+/// Controls a grounded advance patrol AI behavior that moves along the ground 
+/// between patrol points in sequence and optionally uses edge and obstacle detection
+/// to restrict movement.
 /// </summary>
 [RequireComponent(typeof(LookOrientation))]
 [RequireComponent(typeof(Rigidbody2DMovement))]
@@ -11,16 +12,16 @@ public class GroundedAIBehaviorAdvancePatrol : AIBehavior {
     public override bool RequiresLookOrientation => true;
     public override bool RequiresRigidbody2DMovement => true;
 
-    [Header("Patrol Points")]
-    [SerializeField] private List<Transform> patrolPoints = new List<Transform>();
-    [SerializeField] private bool useHardStopAtPatrolPoint = true;
-    [Range(0f, 30f), SerializeField] private float waitTimeAtPatrolPoint = 3f;
-    [Range(0.2f, 10f), SerializeField] private float stoppingDistance = 1f;
+    [Header("Timing")]
     [SerializeField, Range(0.01f, 1f)] private float distanceCheckInterval = 0.1f;
     [SerializeField, Range(0.01f, 1f)] private float patrollingInterval = 0.1f;
-
-    [Header("Detection Timing")]
     [SerializeField, Range(0.01f, 1f)] private float detectionInterval = 0.1f;
+
+    [Header("Patrol Points")]
+    [SerializeField] private List<Transform> patrolPoints = new List<Transform>();
+    [SerializeField] private bool useHardStopAtPatrolPoint = false;
+    [Range(0.2f, 10f), SerializeField] private float stoppingDistance = 1f;
+    [Range(0f, 30f), SerializeField] private float waitTimeAtPatrolPoint = 3f;
 
     [Header("Ground Detection")]
     [SerializeField] private Collider2D groundDetection;
@@ -72,7 +73,7 @@ public class GroundedAIBehaviorAdvancePatrol : AIBehavior {
 
         distanceCheckTimer += Time.deltaTime;
 
-        if (distanceCheckTimer >= patrollingInterval) {
+        if (distanceCheckTimer >= distanceCheckInterval) {
             UpdateHorizontalDistanceToTargetPatrolPoint();
 
             distanceCheckTimer = 0f;
@@ -127,20 +128,18 @@ public class GroundedAIBehaviorAdvancePatrol : AIBehavior {
     }
 
     private void UpdateHorizontalDistanceToTargetPatrolPoint() {
-
-        distanceCheckTimer += Time.deltaTime;
         signedHorizontalDistanceToTargetPatrolPoint = targetPatrolPoint.position.x - transform.position.x;
         horizontalDistanceToTargetPatrolPoint = Mathf.Abs(signedHorizontalDistanceToTargetPatrolPoint);
     }
 
     private void StopAtPatrolPoint() {
-        if (horizontalDistanceToTargetPatrolPoint <= stoppingDistance) {
-            if (useHardStopAtPatrolPoint) {
-                rigidBody2DMovement.HardStopMovement();
-            }
+        if (rigidBody2DMovement.MoveDirection == Vector2.zero) { return; }
 
-            rigidBody2DMovement.SetMoveDirection(Vector2.zero);
+        if (useHardStopAtPatrolPoint) {
+            rigidBody2DMovement.HardStopVelocity();
         }
+
+        rigidBody2DMovement.SetMoveDirection(Vector2.zero);
     }
 
     private void MoveAndOrientToTargetPatrolPoint() {
@@ -152,11 +151,11 @@ public class GroundedAIBehaviorAdvancePatrol : AIBehavior {
 
     private void StopAtEdge() {
         if (!useEdgeDetection || edgeDetection == null) { return; }
-        if (rigidBody2DMovement.GetMoveDirection() == Vector2.zero) { return; }
+        if (rigidBody2DMovement.MoveDirection == Vector2.zero) { return; }
 
         if (!edgeDetection.IsTouchingLayers(groundLayers)) {
             if (useHardStopAtEdge) {
-                rigidBody2DMovement.HardStopMovement();
+                rigidBody2DMovement.HardStopVelocity();
             }
 
             rigidBody2DMovement.SetMoveDirection(Vector2.zero);
@@ -165,12 +164,11 @@ public class GroundedAIBehaviorAdvancePatrol : AIBehavior {
 
     private void StopAtObstacle() {
         if (!useObstacleDetection || obstacleDetection == null) { return; }
-        if (rigidBody2DMovement.GetMoveDirection() == Vector2.zero) { return; }
-
+        if (rigidBody2DMovement.MoveDirection == Vector2.zero) { return; }
 
         if (obstacleDetection.IsTouchingLayers(obstacleLayers)) {
             if (useHardStopAtObstacle) {
-                rigidBody2DMovement.HardStopMovement();
+                rigidBody2DMovement.HardStopVelocity();
             }
 
             StopMovement();

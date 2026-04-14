@@ -33,6 +33,7 @@ public class AIController : MonoBehaviour {
 
         InitializeCurrentBehaviorComponent();
     }
+
     private void DisableAllBehaviorComponents() {
         AIBehavior[] behaviors = GetComponents<AIBehavior>();
 
@@ -68,14 +69,17 @@ public class AIController : MonoBehaviour {
     }
 
     public void EnableControls() {
-        hasControl = true;
+        //hasControl = true;
+
+        rigidBody2DMovement.SetCanMove(true);
+        navMeshRigidbody2DMovement.SetCanMove(true);
     }
 
     public void DisableControls() {
-        hasControl = false;
+        //hasControl = false;
 
-        rigidBody2DMovement.HardStopMovement();
-        rigidBody2DMovement.SetMoveDirection(Vector2.zero);
+        rigidBody2DMovement.SetCanMove(false);
+        navMeshRigidbody2DMovement.SetCanMove(false);
     }
 
     public void ChangeBehavior(AIBehavior behavior) {

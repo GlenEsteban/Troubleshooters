@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Base class for a single attachment that can be used.
+/// Base class for equippable attachments, providing logic for equip/unequip
+/// behavior and a common interface for usage.
 /// </summary>
 public abstract class Attachment: MonoBehaviour {
     public virtual void OnEquip() {

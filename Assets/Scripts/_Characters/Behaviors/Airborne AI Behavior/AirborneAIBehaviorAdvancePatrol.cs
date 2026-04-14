@@ -79,7 +79,7 @@ public class AirborneAIBehaviorAdvancePatrol : AIBehavior {
     private void MoveAndOrientToTargetPatrolPoint() {
         navMeshRigidbody2DMovement.MoveToTarget(targetPatrolPoint.position);
 
-        Vector2 currentMoveDirection = navMeshRigidbody2DMovement.GetMoveDirection();
+        Vector2 currentMoveDirection = navMeshRigidbody2DMovement.MoveDirection;
 
         lookOrientation.SetLookDirection(currentMoveDirection);
     }

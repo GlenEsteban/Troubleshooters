@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// Follows a target along the ground and optionally uses edge and obstacle detection
-/// to restrict movement.
+/// Controls a grounded target following AI behavior that moves along the ground
+/// and optionally uses edge and obstacle detection to restrict movement.
 /// </summary>
 [RequireComponent(typeof(LookOrientation))]
 [RequireComponent(typeof(Rigidbody2DMovement))]
@@ -10,14 +10,14 @@ public class GroundedAIBehaviorFollowTarget : AIBehavior {
     public override bool RequiresLookOrientation => true;
     public override bool RequiresRigidbody2DMovement => true;
 
+    [Header("Timing")]
+    [SerializeField, Range(0.01f, 1f)] private float followingInterval = 0.1f;
+    [SerializeField, Range(0.01f, 1f)] private float detectionInterval = 0.1f;
+
     [Header("Target Following")]
     [SerializeField] private Transform target;
-    [SerializeField] private bool useHardStopAtTarget = true;
+    [SerializeField] private bool useHardStopAtTarget = false;
     [Range(0.2f, 10f), SerializeField] private float stoppingDistance = 1f;
-    [SerializeField, Range(0.01f, 1f)] private float followingInterval = 0.1f;
-
-    [Header("Detection Timing")]
-    [SerializeField, Range(0.01f, 1f)] private float detectionInterval = 0.1f;
 
     [Header("Ground Detection")]
     [SerializeField] private Collider2D groundDetection;
@@ -26,13 +26,13 @@ public class GroundedAIBehaviorFollowTarget : AIBehavior {
     [Header("Edge Detection")]
     [SerializeField] private bool useEdgeDetection = true;
     [SerializeField] private Collider2D edgeDetection;
-    [SerializeField] private bool useHardStopAtEdge = true;
+    [SerializeField] private bool useHardStopAtEdge = false;
 
     [Header("Obstacle Detection")]
     [SerializeField] private bool useObstacleDetection = true;
     [SerializeField] private Collider2D obstacleDetection;
     [SerializeField] private LayerMask obstacleLayers;
-    [SerializeField] private bool useHardStopAtObstacle = true;
+    [SerializeField] private bool useHardStopAtObstacle = false;
 
     private LookOrientation lookOrientation;
     private Rigidbody2DMovement rigidBody2DMovement;
@@ -50,14 +50,15 @@ public class GroundedAIBehaviorFollowTarget : AIBehavior {
 
     public override void UpdateBehavior() {
         if (!CheckIfGrounded() || target == null) {
-            StopMovement();
+            rigidBody2DMovement.StopMovement();
+
             return;
         }
 
         followingTargetTimer += Time.deltaTime;
 
         if (followingTargetTimer >= followingInterval) {
-            UpdateHorizontalDistanceToTargetXPosition();
+            UpdateHorizontalDistanceToTarget();
 
             if (horizontalDistanceToTarget > stoppingDistance) {
                 MoveAndOrientToTargetXPosition();
@@ -85,7 +86,7 @@ public class GroundedAIBehaviorFollowTarget : AIBehavior {
         return groundDetection.IsTouchingLayers(groundLayers);
     }
 
-    private void UpdateHorizontalDistanceToTargetXPosition() {
+    private void UpdateHorizontalDistanceToTarget() {
         signedHorizontalDistanceToTarget = target.position.x - transform.position.x;
         horizontalDistanceToTarget = Mathf.Abs(signedHorizontalDistanceToTarget);
     }
@@ -99,39 +100,35 @@ public class GroundedAIBehaviorFollowTarget : AIBehavior {
 
     private void StopAtTargetXPosition() {
         if (useHardStopAtTarget) {
-            rigidBody2DMovement.HardStopMovement();
+            rigidBody2DMovement.HardStopVelocity();
         }
 
-        StopMovement();
+        rigidBody2DMovement.StopMovement();
     }
 
     private void StopAtEdge() {
         if (!useEdgeDetection || edgeDetection == null) { return; }
-        if (rigidBody2DMovement.GetMoveDirection() == Vector2.zero) { return; }
+        if (rigidBody2DMovement.MoveDirection == Vector2.zero) { return; }
 
         if (!edgeDetection.IsTouchingLayers(groundLayers)) {
             if (useHardStopAtEdge) {
-                rigidBody2DMovement.HardStopMovement();
+                rigidBody2DMovement.HardStopVelocity();
             }
 
-            StopMovement();
+            rigidBody2DMovement.StopMovement();
         }
     }
 
     private void StopAtObstacle() {
         if (!useObstacleDetection || obstacleDetection == null) { return; }
-        if (rigidBody2DMovement.GetMoveDirection() == Vector2.zero) { return; }
+        if (rigidBody2DMovement.MoveDirection == Vector2.zero) { return; }
 
         if (obstacleDetection.IsTouchingLayers(obstacleLayers)) {
             if (useHardStopAtObstacle) {
-                rigidBody2DMovement.HardStopMovement();
+                rigidBody2DMovement.HardStopVelocity();
             }
 
-            StopMovement();
+            rigidBody2DMovement.StopMovement();
         }
-    }
-
-    private void StopMovement() {
-        rigidBody2DMovement.SetMoveDirection(Vector2.zero);
     }
 }
