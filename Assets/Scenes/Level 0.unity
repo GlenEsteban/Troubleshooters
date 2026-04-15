@@ -44126,14 +44126,14 @@ GameObject:
   - component: {fileID: 1533485073}
   - component: {fileID: 1533485080}
   - component: {fileID: 1533485075}
+  - component: {fileID: 1533485074}
   - component: {fileID: 1533485091}
   - component: {fileID: 1533485090}
   - component: {fileID: 1533485094}
   - component: {fileID: 1533485093}
-  - component: {fileID: 1533485074}
-  - component: {fileID: 1533485088}
   - component: {fileID: 1533485082}
   - component: {fileID: 1533485078}
+  - component: {fileID: 1533485088}
   - component: {fileID: 1533485077}
   - component: {fileID: 1533485076}
   - component: {fileID: 1533485084}
@@ -44202,7 +44202,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1533485071}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf30e7f7159dd6840bfaa2f3edaee5fa, type: 3}
   m_Name: 
@@ -44315,7 +44315,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1533485071}
-  m_Enabled: 0
+  m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 10
@@ -44355,8 +44355,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d36895588a07912429213259d5123818, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AirborneAIBehaviorSimplePatrol
-  startingMoveDirection: {x: 1, y: 0}
   stopCheckInterval: 0.1
+  detectionInterval: 0.1
+  startingMoveDirection: {x: 1, y: 0}
   useObstacleInFrontDetection: 1
   obstacleInFrontDetection: {fileID: 766737443}
   useObstacleAboveDetection: 1
@@ -44367,7 +44368,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 40320
   useHardStopAtObstacle: 0
-  detectionInterval: 0.1
 --- !u!114 &1533485091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44375,12 +44375,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1533485071}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e4fe633444a1ab44a2a5e5314be99be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIController
-  currentBehavior: {fileID: 1533485090}
+  grabbedBehavior: {fileID: 0}
+  currentBehavior: {fileID: 1533485094}
 --- !u!114 &1533485092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44403,16 +44404,17 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1533485071}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bfdf5863727becf4b8d0630a15bb8de7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AirborneAIBehaviorAdvancePatrol
+  distanceCheckInterval: 0.1
+  patrollingInterval: 0.1
+  detectionInterval: 0.1
   patrolPoints: []
   waitTimeAtPatrolPoint: 3
   stoppingDistance: 1
-  distanceCheckInterval: 0.1
-  patrollingInterval: 0.1
 --- !u!114 &1533485094
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44425,7 +44427,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea50b0ef5e39027488a4cc1e18647acd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AirborneAIBehaviorFollowTarget
-  target: {fileID: 0}
+  followingInterval: 0.1
+  target: {fileID: 754161112}
+  stoppingDistance: 1
 --- !u!1 &1557472794
 GameObject:
   m_ObjectHideFlags: 0
@@ -55532,7 +55536,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e4fe633444a1ab44a2a5e5314be99be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentBehavior: {fileID: 8416674493269540896}
+  grabbedBehavior: {fileID: 8416674493269540897}
+  currentBehavior: {fileID: 8416674493269540895}
 --- !u!4 &8416674493269540872
 Transform:
   m_ObjectHideFlags: 0
@@ -55574,8 +55579,8 @@ GameObject:
   - component: {fileID: 8416674493269540889}
   - component: {fileID: 8416674493269540884}
   - component: {fileID: 8416674493269540890}
-  - component: {fileID: 8416674493269540892}
   - component: {fileID: 8416674493269540893}
+  - component: {fileID: 8416674493269540897}
   m_Layer: 8
   m_Name: Sweepbot
   m_TagString: Untagged
@@ -55718,32 +55723,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Emotion
   currentEmotion: 0
---- !u!114 &8416674493269540892
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8416674493269540873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d23b5f67eb15e44eae8f0834d778525, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SimplePatrol
-  startingMoveDirection: {x: -1, y: 0}
-  useHardStopOnTurnAround: 1
-  detectionInterval: 0.1
-  groundDetection: {fileID: 457400138}
-  groundLayers:
-    serializedVersion: 2
-    m_Bits: 40320
-  useEdgeDetection: 1
-  edgeDetection: {fileID: 1107383680}
-  useObstacleDetection: 1
-  obstacleDetection: {fileID: 26901123}
-  obstacleLayers:
-    serializedVersion: 2
-    m_Bits: 40320
 --- !u!114 &8416674493269540893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55772,11 +55751,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29e2167f21dedef40939f97a72ce04f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GroundedAIBehaviorFollowTarget
+  followingInterval: 0.1
+  detectionInterval: 0.1
   target: {fileID: 754161112}
   useHardStopAtTarget: 0
   stoppingDistance: 1
-  followingInterval: 0.1
-  detectionInterval: 0.1
   groundDetection: {fileID: 457400138}
   groundLayers:
     serializedVersion: 2
@@ -55802,13 +55781,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c03c1d91747d74b4685abad012de0e99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GroundedAIBehaviorAdvancePatrol
-  patrolPoints: []
-  useHardStopAtPatrolPoint: 1
-  waitTimeAtPatrolPoint: 3
-  stoppingDistance: 1
   distanceCheckInterval: 0.1
   patrollingInterval: 0.1
   detectionInterval: 0.1
+  patrolPoints:
+  - {fileID: 1533485073}
+  - {fileID: 754161112}
+  useHardStopAtPatrolPoint: 1
+  stoppingDistance: 1
+  waitTimeAtPatrolPoint: 3
   groundDetection: {fileID: 457400138}
   groundLayers:
     serializedVersion: 2
@@ -55834,9 +55815,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d23b5f67eb15e44eae8f0834d778525, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GroundedAIBehaviorSimplePatrol
+  detectionInterval: 0.1
   startingMoveDirection: {x: 1, y: 0}
   useHardStopOnTurnAround: 1
-  detectionInterval: 0.1
   groundDetection: {fileID: 457400138}
   groundLayers:
     serializedVersion: 2
@@ -55846,6 +55827,22 @@ MonoBehaviour:
   useObstacleDetection: 1
   obstacleDetection: {fileID: 26901123}
   obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 40320
+--- !u!114 &8416674493269540897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8416674493269540873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8280b444f2ce1524bbdc4915c447f7ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbedAIBehavior
+  groundDetection: {fileID: 457400138}
+  groundLayers:
     serializedVersion: 2
     m_Bits: 40320
 --- !u!1660057539 &9223372036854775807

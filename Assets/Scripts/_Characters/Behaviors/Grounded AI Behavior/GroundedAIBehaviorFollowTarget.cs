@@ -88,6 +88,7 @@ public class GroundedAIBehaviorFollowTarget : AIBehavior {
 
     private void UpdateHorizontalDistanceToTarget() {
         signedHorizontalDistanceToTarget = target.position.x - transform.position.x;
+
         horizontalDistanceToTarget = Mathf.Abs(signedHorizontalDistanceToTarget);
     }
 

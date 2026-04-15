@@ -2,8 +2,9 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Patrols through the air by moving in a set direction and changing 
-/// direction when obstacles are detected in front, above, or below.
+/// Controls an airborne simple patrol AI behavior that moves through the air 
+/// by moving in a set direction and changing direction when obstacles are 
+/// detected in front, above, or below.
 /// </summary>
 [RequireComponent(typeof(LookOrientation))]
 [RequireComponent(typeof(Rigidbody2DMovement))]
@@ -11,9 +12,12 @@ public class AirborneAIBehaviorSimplePatrol : AIBehavior {
     public override bool RequiresLookOrientation => true;
     public override bool RequiresRigidbody2DMovement => true;
 
+    [Header("Timing")]
+    [SerializeField, Range(0.01f, 1f)] private float stopCheckInterval = 0.1f;
+    [SerializeField, Range(0.01f, 1f)] private float detectionInterval = 0.1f;
+
     [Header("Movement")]
     [SerializeField] private Vector2 startingMoveDirection = Vector2.right;
-    [SerializeField, Range(0.01f, 1f)] private float stopCheckInterval = 0.1f;
 
     [Header("Obstacle Detection")]
     [SerializeField] private bool useObstacleInFrontDetection = true;
@@ -23,16 +27,13 @@ public class AirborneAIBehaviorSimplePatrol : AIBehavior {
     [SerializeField] private bool useObstacleBelowDetection = true;
     [SerializeField] private Collider2D obstacleBelowDetection;
     [SerializeField] private LayerMask obstacleLayers;
-    [SerializeField] private bool useHardStopAtObstacle = true;
-    [SerializeField, Range(0.01f, 1f)] private float detectionInterval = 0.1f;
+    [SerializeField] private bool useHardStopAtObstacle = false;
 
     private LookOrientation lookOrientation;
     private Rigidbody2DMovement rigidBody2DMovement;
 
     private float stopCheckTimer;
     private float detectionTimer;
-
-    private const float MIN_MOVE_THRESHOLD = 0.001f;
 
     private void Awake() {
         lookOrientation = GetComponent<LookOrientation>();
@@ -48,7 +49,7 @@ public class AirborneAIBehaviorSimplePatrol : AIBehavior {
         stopCheckTimer += Time.deltaTime;
 
         if (stopCheckTimer >= stopCheckInterval) {
-            CheckAndResetStoppedMovement();
+            ResumeMovement();
 
             stopCheckTimer = 0f;
         }
@@ -61,16 +62,11 @@ public class AirborneAIBehaviorSimplePatrol : AIBehavior {
             detectionTimer = 0f;
         }
     }
+    private void ResumeMovement() {
+        if (rigidBody2DMovement.MoveDirection == Vector2.zero) {
+            Vector2 facingDirection = lookOrientation.FacingDirection;
 
-    private void CheckAndResetStoppedMovement() {
-
-        Vector2 currentMoveDirection = rigidBody2DMovement.MoveDirection;
-
-        if (currentMoveDirection == Vector2.zero) {
-            currentMoveDirection = startingMoveDirection;
-
-            rigidBody2DMovement.SetMoveDirection(currentMoveDirection);
-            lookOrientation.SetLookDirection(currentMoveDirection);
+            rigidBody2DMovement.SetMoveDirection(facingDirection);
         }
     }
 

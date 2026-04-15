@@ -53,15 +53,11 @@ public class GroundedAIBehaviorSimplePatrol : AIBehavior {
 
     public override void UpdateBehavior() {
         if (!CheckIfGrounded()) {
-            FlipOnLiftOff();
-
-            wasGrounded = false;
-
             rigidBody2DMovement.StopMovement();
 
             return;
         }
-        else if (rigidBody2DMovement.MoveDirection == Vector2.zero) {
+        else {
             ResumeMovement();
         }
 
@@ -83,16 +79,12 @@ public class GroundedAIBehaviorSimplePatrol : AIBehavior {
         return groundDetection.IsTouchingLayers(groundLayers);
     }
 
-    private void FlipOnLiftOff() {
-        if (wasGrounded && rigidBody2DMovement.MoveDirection != Vector2.zero) {
-            lookOrientation.FlipLookOrientation();
-        }
-    }
-
     private void ResumeMovement() {
-        Vector2 facingDirection = lookOrientation.FacingDirection;
+        if (rigidBody2DMovement.MoveDirection == Vector2.zero) {
+            Vector2 facingDirection = lookOrientation.FacingDirection;
 
-        rigidBody2DMovement.SetMoveDirection(facingDirection);
+            rigidBody2DMovement.SetMoveDirection(facingDirection);
+        }
     }
 
     private void TurnAroundAtEdge() {

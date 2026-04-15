@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Implements airborne AI Behavior that has the character patrol through 
-/// airborne patrol points in sequence, moving toward each point
-/// and waiting briefly before advancing to the next.
+/// Controls an airborne advance patrol AI behavior that moves through the air 
+/// between patrol points in sequence and waits briefly before advancing to the 
+/// next patrol point.
 /// </summary>
 [RequireComponent(typeof(LookOrientation))]
 [RequireComponent(typeof(NavMeshRigidbody2DMovement))]
@@ -12,12 +12,15 @@ public class AirborneAIBehaviorAdvancePatrol : AIBehavior {
     public override bool RequiresLookOrientation => true;
     public override bool RequiresNavMeshRigidbody2DMovement => true;
 
+    [Header("Timing")]
+    [SerializeField, Range(0.01f, 1f)] private float distanceCheckInterval = 0.1f;
+    [SerializeField, Range(0.01f, 1f)] private float patrollingInterval = 0.1f;
+    [SerializeField, Range(0.01f, 1f)] private float detectionInterval = 0.1f;
+
     [Header("Patrol Points")]
     [SerializeField] private List<Transform> patrolPoints;
     [Range(0f, 30f), SerializeField] private float waitTimeAtPatrolPoint = 3f;
     [Range(0.2f, 10f), SerializeField] private float stoppingDistance = 1f;
-    [SerializeField, Range(0.01f, 1f)] private float distanceCheckInterval = 0.1f;
-    [SerializeField, Range(0.01f, 1f)] private float patrollingInterval = 0.1f;
 
     private LookOrientation lookOrientation;
     private NavMeshRigidbody2DMovement navMeshRigidbody2DMovement;
@@ -25,7 +28,7 @@ public class AirborneAIBehaviorAdvancePatrol : AIBehavior {
     private Transform targetPatrolPoint;
     private int targetPatrolPointIndex;
 
-    float distanceFromPatrolPoint;
+    float distanceFromTargetPatrolPoint;
 
     private float distanceCheckTimer;
     private float patrollingTimer;
@@ -51,12 +54,12 @@ public class AirborneAIBehaviorAdvancePatrol : AIBehavior {
         distanceCheckTimer += Time.deltaTime;
 
         if (distanceCheckTimer > distanceCheckInterval) {
-            distanceFromPatrolPoint = Vector2.Distance((Vector2)targetPatrolPoint.position, (Vector2)transform.position);
+            UpdateDistanceToTargetPatrolPoint();
 
             distanceCheckTimer = 0f;
         }
 
-        if (distanceFromPatrolPoint >= stoppingDistance) {
+        if (distanceFromTargetPatrolPoint >= stoppingDistance) {
             patrollingTimer += Time.deltaTime;
 
             if (patrollingTimer > patrollingInterval) {
@@ -66,6 +69,8 @@ public class AirborneAIBehaviorAdvancePatrol : AIBehavior {
             }
         }
         else {
+            StopAtPatrolPoint();
+
             waitAtPatrolPointTimer += Time.deltaTime;
 
             if (waitAtPatrolPointTimer > waitTimeAtPatrolPoint) {
@@ -76,12 +81,20 @@ public class AirborneAIBehaviorAdvancePatrol : AIBehavior {
         }
     }
 
+    private void UpdateDistanceToTargetPatrolPoint() {
+        distanceFromTargetPatrolPoint = Vector2.Distance((Vector2)targetPatrolPoint.position, (Vector2)transform.position);
+    }
+
     private void MoveAndOrientToTargetPatrolPoint() {
         navMeshRigidbody2DMovement.MoveToTarget(targetPatrolPoint.position);
 
         Vector2 currentMoveDirection = navMeshRigidbody2DMovement.MoveDirection;
 
         lookOrientation.SetLookDirection(currentMoveDirection);
+    }
+
+    private void StopAtPatrolPoint() {
+        navMeshRigidbody2DMovement.StopNavMeshNavigation();
     }
 
     private void AdvanceToNextPatrolPoint() {

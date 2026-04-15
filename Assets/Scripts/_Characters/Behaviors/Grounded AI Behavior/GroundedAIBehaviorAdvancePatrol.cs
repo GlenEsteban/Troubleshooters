@@ -3,8 +3,8 @@ using UnityEngine;
 
 /// <summary>
 /// Controls a grounded advance patrol AI behavior that moves along the ground 
-/// between patrol points in sequence and optionally uses edge and obstacle detection
-/// to restrict movement.
+/// between patrol points in sequence, waits briefly before advancing to the next 
+/// patrol point, and optionally uses edge and obstacle detection to restrict movement.
 /// </summary>
 [RequireComponent(typeof(LookOrientation))]
 [RequireComponent(typeof(Rigidbody2DMovement))]
@@ -30,13 +30,13 @@ public class GroundedAIBehaviorAdvancePatrol : AIBehavior {
     [Header("Edge Detection")]
     [SerializeField] private bool useEdgeDetection = true;
     [SerializeField] private Collider2D edgeDetection;
-    [SerializeField] private bool useHardStopAtEdge = true;
+    [SerializeField] private bool useHardStopAtEdge = false;
 
     [Header("Obstacle Detection")]
     [SerializeField] private bool useObstacleDetection = true;
     [SerializeField] private Collider2D obstacleDetection;
     [SerializeField] private LayerMask obstacleLayers;
-    [SerializeField] private bool useHardStopAtObstacle = true;
+    [SerializeField] private bool useHardStopAtObstacle = false;
 
     private LookOrientation lookOrientation;
     private Rigidbody2DMovement rigidBody2DMovement;
@@ -69,7 +69,11 @@ public class GroundedAIBehaviorAdvancePatrol : AIBehavior {
     }
 
     public override void UpdateBehavior() {
-        if (!CheckIfGrounded()) { return; }
+        if (!CheckIfGrounded()) {
+            rigidBody2DMovement.StopMovement();
+
+            return;
+        }
 
         distanceCheckTimer += Time.deltaTime;
 
@@ -171,11 +175,7 @@ public class GroundedAIBehaviorAdvancePatrol : AIBehavior {
                 rigidBody2DMovement.HardStopVelocity();
             }
 
-            StopMovement();
+            rigidBody2DMovement.StopMovement();
         }
-    }
-
-    private void StopMovement() {
-        rigidBody2DMovement.SetMoveDirection(Vector2.zero);
     }
 }

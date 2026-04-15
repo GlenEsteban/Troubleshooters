@@ -1,12 +1,12 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 /// <summary>
 /// Enables or disables control based on interaction state, delegates AI behavior updates
 /// to the current behavior, and configures components required by the current behavior.
 /// </summary>
 public class AIController : MonoBehaviour {
-    public bool HasControl => hasControl;
-
+    [SerializeField] protected AIBehavior grabbedBehavior;
     [SerializeField] protected AIBehavior currentBehavior;
 
     private LookOrientation lookOrientation;
@@ -14,7 +14,9 @@ public class AIController : MonoBehaviour {
     private NavMeshRigidbody2DMovement navMeshRigidbody2DMovement;
     private GrabbableObject grabbableObject;
 
-    private bool hasControl = true;
+    private bool isGrabbed = false;
+
+    private AIBehavior previousBehavior;
 
     private void Awake() {
         // Optional components. Used only if required by the current behavior.
@@ -34,6 +36,25 @@ public class AIController : MonoBehaviour {
         InitializeCurrentBehaviorComponent();
     }
 
+    private void OnEnable() {
+        if (grabbableObject == null) { return; }
+
+        grabbableObject.Grabbed += SwitchToGrabbedAIBehavior;
+        grabbableObject.Released += SwitchBackToPreviousBehavior;
+    }
+
+    private void OnDisable() {
+        if (grabbableObject == null) { return; }
+
+        grabbableObject.Grabbed -= SwitchToGrabbedAIBehavior;
+        grabbableObject.Released -= SwitchBackToPreviousBehavior;
+    }
+
+    private void Update() {
+        if (currentBehavior == null) { return; }
+
+        currentBehavior.UpdateBehavior();
+    }
     private void DisableAllBehaviorComponents() {
         AIBehavior[] behaviors = GetComponents<AIBehavior>();
 
@@ -48,38 +69,36 @@ public class AIController : MonoBehaviour {
         currentBehavior.enabled = true;
     }
 
-    private void OnEnable() {
-        if (grabbableObject == null) { return; }
-
-        grabbableObject.Grabbed += DisableControls;
-        grabbableObject.Released += EnableControls;
-    }
-
-    private void OnDisable() {
-        if (grabbableObject == null) { return; }
-
-        grabbableObject.Grabbed -= DisableControls;
-        grabbableObject.Released -= EnableControls;
-    }
-
-    private void Update() {
-        if (!hasControl || currentBehavior == null) { return; }
-
-        currentBehavior.UpdateBehavior();
-    }
-
     public void EnableControls() {
-        //hasControl = true;
-
         rigidBody2DMovement.SetCanMove(true);
         navMeshRigidbody2DMovement.SetCanMove(true);
     }
 
     public void DisableControls() {
-        //hasControl = false;
-
         rigidBody2DMovement.SetCanMove(false);
         navMeshRigidbody2DMovement.SetCanMove(false);
+    }
+
+    private void SwitchToGrabbedAIBehavior() {
+        if (isGrabbed) { return; }
+
+        isGrabbed = true;
+
+        previousBehavior = currentBehavior;
+
+        DisableControls();
+
+        ChangeBehavior(grabbedBehavior);
+    }
+
+    private void SwitchBackToPreviousBehavior() {
+        if (!isGrabbed) { return; }
+
+        isGrabbed = false;
+
+        EnableControls();
+
+        ChangeBehavior(previousBehavior);
     }
 
     public void ChangeBehavior(AIBehavior behavior) {

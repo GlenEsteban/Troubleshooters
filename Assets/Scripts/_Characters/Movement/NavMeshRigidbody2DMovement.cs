@@ -9,7 +9,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Rigidbody2D))]
 public class NavMeshRigidbody2DMovement : MonoBehaviour {
-    public Vector2 MoveDirection => navMeshAgent.desiredVelocity.normalized;
+    public Vector2 MoveDirection => GetMoveDirection();
 
     [Header("Movement")]
     [SerializeField, Range(1f, 100f)] private float acceleration = 20f;
@@ -28,6 +28,14 @@ public class NavMeshRigidbody2DMovement : MonoBehaviour {
         if (!canMove) {
             StopNavMeshNavigation();
         }
+    }
+
+    private Vector2 GetMoveDirection() {
+        if (navMeshAgent.isStopped) {
+            return Vector2.zero;
+        }
+
+        return navMeshAgent.desiredVelocity;
     }
 
     private void Awake() {
