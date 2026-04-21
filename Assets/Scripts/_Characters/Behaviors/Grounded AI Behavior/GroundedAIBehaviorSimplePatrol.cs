@@ -33,8 +33,6 @@ public class GroundedAIBehaviorSimplePatrol : AIBehavior {
     private LookOrientation lookOrientation;
     private Rigidbody2DMovement rigidBody2DMovement;
 
-    private bool wasGrounded;
-
     private float detectionTimer;
 
     private void Awake() {
@@ -47,12 +45,13 @@ public class GroundedAIBehaviorSimplePatrol : AIBehavior {
 
         rigidBody2DMovement.SetMoveDirection(startingMoveDirection);
         lookOrientation.SetLookDirection(startingMoveDirection);
-
-        wasGrounded = CheckIfGrounded();
     }
 
     public override void UpdateBehavior() {
-        if (!CheckIfGrounded()) {
+        bool isGrounded = CheckIfGrounded();
+
+        if (!isGrounded) {
+            if (rigidBody2DMovement.MoveDirection == Vector2.zero) { return; }
             rigidBody2DMovement.StopMovement();
 
             return;
@@ -61,12 +60,16 @@ public class GroundedAIBehaviorSimplePatrol : AIBehavior {
             ResumeMovement();
         }
 
-        wasGrounded = true;
-
         detectionTimer += Time.deltaTime;
 
         if (detectionTimer >= detectionInterval) {
-            TurnAroundAtEdge();
+            
+            if (TurnAroundAtEdge()) {
+                detectionTimer = 0f;
+
+                return;
+            }
+
             TurnAroundAtObstacle();
 
             detectionTimer = 0f;
@@ -87,8 +90,8 @@ public class GroundedAIBehaviorSimplePatrol : AIBehavior {
         }
     }
 
-    private void TurnAroundAtEdge() {
-        if (!useEdgeDetection || edgeDetection == null) { return; }
+    private bool TurnAroundAtEdge() {
+        if (!useEdgeDetection || edgeDetection == null) { return false; }
 
         if (!edgeDetection.IsTouchingLayers(groundLayers)) {
             if (useHardStopOnTurnAround) {
@@ -96,7 +99,11 @@ public class GroundedAIBehaviorSimplePatrol : AIBehavior {
             }
 
             TurnAround();
+
+            return true;
         }
+
+        return false;
     }
 
     private void TurnAroundAtObstacle() {

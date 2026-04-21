@@ -1,49 +1,59 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Processes player input to control movement, orientation,
+/// and attachment interactions.
+/// </summary>
+
+[RequireComponent(typeof(Rigidbody2DMovement))]
+[RequireComponent(typeof(LookOrientation))]
 public class PlayerController : MonoBehaviour {
-    private PlayerInput _playerInput;
-    private Rigidbody2DMovement _playerMovement;
-    private ClawAttachment _clawAttachment;
-    private LookOrientation _lookOrientation;
+    private PlayerInputActions playerInputActions;
+    private Rigidbody2DMovement rigidBody2DMovement;
+    private LookOrientation lookOrientation;
+
+    private ClawAttachment clawAttachment;
 
     private void Awake() {
-        _playerInput = new PlayerInput();
-        _lookOrientation = GetComponent<LookOrientation>();
-        _playerMovement = GetComponent<Rigidbody2DMovement>();
+        playerInputActions = new PlayerInputActions();
+        lookOrientation = GetComponent<LookOrientation>();
+        rigidBody2DMovement = GetComponent<Rigidbody2DMovement>();
 
-        _clawAttachment = GetComponentInChildren<ClawAttachment>();
+        // TEMP: will add multiple attachments and an attachmentController 
+        clawAttachment = GetComponentInChildren<ClawAttachment>();
     }
 
     private void OnEnable() {
-        _playerInput.Enable();
+        playerInputActions.Enable();
 
-        _playerInput.Player.Move.performed += Move;
-        _playerInput.Player.Move.canceled += Move;
-        _playerInput.Player.GrabDrop.performed += GrabDrop;
-        _playerInput.Player.GrabDrop.canceled += GrabDrop;
+        playerInputActions.Player.Move.performed += Move;
+        playerInputActions.Player.Move.canceled += Move;
+        playerInputActions.Player.AttachmentPrimaryUse.performed += AttachmentPrimaryUse;
+        playerInputActions.Player.AttachmentSecondaryUse.performed += AttachmentSecondaryUse;
     }
 
     private void OnDisable() {
-        _playerInput.Disable();
+        playerInputActions.Disable();
 
-        _playerInput.Player.Move.performed -= Move;
-        _playerInput.Player.Move.canceled -= Move;
-        _playerInput.Player.GrabDrop.performed -= GrabDrop;
-        _playerInput.Player.GrabDrop.canceled -= GrabDrop;
+        playerInputActions.Player.Move.performed -= Move;
+        playerInputActions.Player.Move.canceled -= Move;
+        playerInputActions.Player.AttachmentPrimaryUse.performed -= AttachmentPrimaryUse;
+        playerInputActions.Player.AttachmentSecondaryUse.performed -= AttachmentSecondaryUse;
     }
 
     private void Move(InputAction.CallbackContext context) {
         Vector2 moveDirection = context.ReadValue<Vector2>();
 
-        _playerMovement.SetMoveDirection(moveDirection);
-        _lookOrientation.SetLookDirection(moveDirection);
+        rigidBody2DMovement.SetMoveDirection(moveDirection);
+        lookOrientation.SetLookDirection(moveDirection);
     }
 
-    private void GrabDrop(InputAction.CallbackContext context) {
-        if (context.phase == InputActionPhase.Performed) {
-            _clawAttachment.Use();
-        }
+    private void AttachmentPrimaryUse(InputAction.CallbackContext context) {
+        clawAttachment?.PrimaryUse();
+    }
+
+    private void AttachmentSecondaryUse(InputAction.CallbackContext context) {
+        clawAttachment.SecondaryUse();
     }
 }

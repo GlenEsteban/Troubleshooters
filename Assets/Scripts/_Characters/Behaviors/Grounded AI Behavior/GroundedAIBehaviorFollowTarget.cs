@@ -49,7 +49,9 @@ public class GroundedAIBehaviorFollowTarget : AIBehavior {
     }
 
     public override void UpdateBehavior() {
-        if (!CheckIfGrounded() || target == null) {
+        bool isGrounded = CheckIfGrounded();
+
+        if (!isGrounded || target == null) {
             rigidBody2DMovement.StopMovement();
 
             return;

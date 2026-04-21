@@ -69,7 +69,9 @@ public class GroundedAIBehaviorAdvancePatrol : AIBehavior {
     }
 
     public override void UpdateBehavior() {
-        if (!CheckIfGrounded()) {
+        bool isGrounded = CheckIfGrounded();
+
+        if (!isGrounded) {
             rigidBody2DMovement.StopMovement();
 
             return;

@@ -3,10 +3,16 @@ using UnityEngine;
 /// <summary>
 /// Uses a move direction and Rigidbody2D for physics-based movement,
 /// applying acceleration and deceleration for smooth motion.
+/// 
+/// Ground detection is used to ensure correct behavior for grounded characters.
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class Rigidbody2DMovement : MonoBehaviour {
     public Vector2 MoveDirection => moveDirection;
+
+    [Header("Ground Detection")]
+    [SerializeField] private Collider2D groundDetection;
+    [SerializeField] private LayerMask groundLayers;
 
     [Header("Movement")]
     [Range(1f, 100f), SerializeField] float acceleration = 20f;
@@ -16,6 +22,8 @@ public class Rigidbody2DMovement : MonoBehaviour {
     private Rigidbody2D rb;
 
     private bool canMove = true;
+    private bool isGroundedCharacter;
+    private bool isGrounded;
 
     private Vector2 moveDirection;
 
@@ -33,7 +41,23 @@ public class Rigidbody2DMovement : MonoBehaviour {
         rb = GetComponent<Rigidbody2D>();
     }
 
+    private void Start() {
+        isGroundedCharacter = rb.gravityScale != 0 ? true : false;
+    }
+
     void FixedUpdate() {
+        if (isGroundedCharacter) {
+            if (groundDetection != null) {
+                isGrounded = groundDetection.IsTouchingLayers(groundLayers);
+            }
+            else {
+                Debug.LogError(gameObject.name + " Needs a ground detector for grounded rigidbody 2D movement!");
+                return;
+            }
+
+            if (!isGrounded) { return; }
+        }
+
         if (!canMove || moveDirection.sqrMagnitude <= MIN_MOVE_THRESHOLD) {
             ApplyMovementDeceleration();
         }

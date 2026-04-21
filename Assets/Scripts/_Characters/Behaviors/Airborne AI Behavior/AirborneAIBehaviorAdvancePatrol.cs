@@ -15,7 +15,6 @@ public class AirborneAIBehaviorAdvancePatrol : AIBehavior {
     [Header("Timing")]
     [SerializeField, Range(0.01f, 1f)] private float distanceCheckInterval = 0.1f;
     [SerializeField, Range(0.01f, 1f)] private float patrollingInterval = 0.1f;
-    [SerializeField, Range(0.01f, 1f)] private float detectionInterval = 0.1f;
 
     [Header("Patrol Points")]
     [SerializeField] private List<Transform> patrolPoints;

@@ -5,12 +5,12 @@ using UnityEngine;
 /// Tracks the current emotion and notifies when emotion changes.
 /// </summary>
 public class Emotion : MonoBehaviour {
-    public event Action<EmotionType> EmotionChanged;
-    public EmotionType CurrentEmotion => currentEmotion;
+    public event Action<DisplayAnimation> EmotionChanged;
+    public DisplayAnimation CurrentEmotion => currentEmotion;
 
-    [SerializeField] private EmotionType currentEmotion;
+    [SerializeField] private DisplayAnimation currentEmotion;
 
-    public void SetEmotion(EmotionType emotion) {
+    public void SetEmotion(DisplayAnimation emotion) {
         if (currentEmotion == emotion) { return; }
 
         currentEmotion = emotion;

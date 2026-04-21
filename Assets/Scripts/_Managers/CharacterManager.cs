@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ using UnityEngine;
 /// to multiple characters.
 /// </summary>
 public class CharacterManager : MonoBehaviour {
+    public event Action RegistryOrderUpdated;
     public static CharacterManager Instance { get; private set; }
 
     public IReadOnlyList<Character> PlayerCharacters => playerCharacters.AsReadOnly();
@@ -57,6 +59,8 @@ public class CharacterManager : MonoBehaviour {
     /// Unregisters a character from the manager.
     /// </summary>
     public void RemoveCharacter(Character character) {
+        RegistryOrderUpdated?.Invoke(); 
+
         switch (character.Type) {
             case CharacterType.Player:
                 if (!playerCharacters.Contains(character)) {
@@ -76,5 +80,9 @@ public class CharacterManager : MonoBehaviour {
             case CharacterType.None:
                 break;
         }
+    }
+
+    public int GetPlayerIndex(Character character) {
+        return playerCharacters.IndexOf(character);
     }
 }
