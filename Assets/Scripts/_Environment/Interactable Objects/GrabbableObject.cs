@@ -47,9 +47,9 @@ public class GrabbableObject : MonoBehaviour {
             Vector2 anchorToTargetDisplacement = anchorPoint.targetWorldPosition - anchorWorldPosition;
 
             Vector2 stiffnessForce = anchorToTargetDisplacement * stiffness;
-            Vector2 dampingForce = anchorVelocity * damping;
+            Vector2 dampingForce = - anchorVelocity * damping;
 
-            Vector2 force = stiffnessForce - dampingForce;
+            Vector2 force = stiffnessForce + dampingForce;
 
             force = Vector2.ClampMagnitude(force, maxForce);
 

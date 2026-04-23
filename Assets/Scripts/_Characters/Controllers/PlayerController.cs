@@ -9,11 +9,13 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2DMovement))]
 [RequireComponent(typeof(LookOrientation))]
 public class PlayerController : MonoBehaviour {
+    [SerializeField] private Transform playerCenter;
     private PlayerInputActions playerInputActions;
     private Rigidbody2DMovement rigidBody2DMovement;
     private LookOrientation lookOrientation;
 
     private ClawAttachment clawAttachment;
+
 
     private void Awake() {
         playerInputActions = new PlayerInputActions();
@@ -46,7 +48,6 @@ public class PlayerController : MonoBehaviour {
         Vector2 moveDirection = context.ReadValue<Vector2>();
 
         rigidBody2DMovement.SetMoveDirection(moveDirection);
-        lookOrientation.SetLookDirection(moveDirection);
     }
 
     private void AttachmentPrimaryUse(InputAction.CallbackContext context) {
@@ -55,5 +56,16 @@ public class PlayerController : MonoBehaviour {
 
     private void AttachmentSecondaryUse(InputAction.CallbackContext context) {
         clawAttachment.SecondaryUse();
+    }
+
+    private void Update() {
+        Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+        Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+
+        Vector2 selfToMouseDisplacement = mouseWorldPosition - playerCenter.transform.position;
+
+        lookOrientation.SetLookDirection(selfToMouseDisplacement.normalized);
+
+        clawAttachment.SetTargetPosition(mouseWorldPosition);
     }
 }

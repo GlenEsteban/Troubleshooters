@@ -8,7 +8,7 @@ public class MouseGrabber : MonoBehaviour {
 
     private GrabbableObject grabbedObject;
 
-    private int anchorID = -99; 
+    private int anchorID = 999; 
 
     void Update() {
         // TEMP: INPUT FOR TESTING GRAB FUNCTIONALITY
