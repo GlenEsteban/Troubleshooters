@@ -27,15 +27,14 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [SerializeField] private GrabbableObjectDetector detector;
 
     [Header("Ignored Collisions")]
-    [SerializeField] private Collider2D[] targetColliders;
+    [SerializeField] private Collider2D[] grabbedObjectColliders;
     [SerializeField] private LayerMask targetLayer;
     [SerializeField, Range(0f, 1)] private float overlapCheckInterval = 0.1f;    
 
-    [Header("Follow Target Spring-Damper System")]
-    [SerializeField, Range(0f, 50)] private float followTargetRange = 3f;
-    [SerializeField, Range(0f, 50)] private float stiffness = 50f;
+    [Header("Interact Mode Spring-Damper System")]
+    [SerializeField, Range(0f, 500)] private float stiffness = 50f;
     [SerializeField, Range(0f, 50)] private float damping = 2f;
-    [SerializeField, Range(0f, 50)] private float maxForce = 10f;
+    [SerializeField, Range(0f, 500)] private float maxForce = 10f;
 
     [Header("Anchor")]
     [SerializeField] private int anchorId;
@@ -44,16 +43,18 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [Header("Release")]
     [SerializeField] private float unintendedReleaseThreshold = 1f;
 
-    private GrabbableObject targetGrabbableObject;
+    private GrabbableObject grabbedObject;
+    private RelativeJoint2D relativeJoint2D;
 
-    private Vector3 targetPosition;
+    private Vector2 clawLookDirection;
 
-    private IUsableObject targetUsableObject;
+    private IUsableObject usableObject;
 
     private bool isClawClosed = false;
+    private bool isInInteractMode = false;
 
     public void SetTargetPosition(Vector2 direction) {
-        targetPosition = direction;
+        clawLookDirection = direction;
     }
 
     private void OnEnable() {
@@ -64,16 +65,26 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         CharacterManager.Instance.RegistryOrderUpdated -= UpdateAnchorId;
     }
 
+    private void Awake() {
+        relativeJoint2D = GetComponentInChildren<RelativeJoint2D>();
+    }
+
     private void Start() {
         UpdateAnchorId();
     }
 
     private void FixedUpdate() {
-        MoveClawToTarget();
+        // Enable relative joint when not following target
+        relativeJoint2D.enabled = !isInInteractMode;
 
-        if (targetGrabbableObject == null || anchorPoint == null) { return; }
+        if (isInInteractMode) {
+            MoveClawToTarget();
+            OrientClawToTarget();
+        }
 
-        targetGrabbableObject.UpdateAnchorTargetWorldPosition(anchorId, anchorPoint.position);
+        if (grabbedObject == null || anchorPoint == null) { return; }
+
+        grabbedObject.UpdateAnchorTargetWorldPosition(anchorId, anchorPoint.position);
 
         CheckForUnintendedRelease();
     }
@@ -83,14 +94,10 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     private void MoveClawToTarget() {
-        Vector2 userToTargetDisplacement = targetPosition - userTransform.position;
-
-        if (userToTargetDisplacement.magnitude > followTargetRange) { return; }
-
-        Vector2 clawToTargetDisplacement = targetPosition - clawTransform.position;
+        Vector2 clawToTargetDisplacement = clawLookDirection - (Vector2) clawTransform.position;
 
         Vector2 stiffnessForce = clawToTargetDisplacement * stiffness;
-        Vector2 dampingForce = - clawRigidBody2D.linearVelocity * damping;
+        Vector2 dampingForce = -clawRigidBody2D.linearVelocity * damping;
 
         Vector2 force = stiffnessForce + dampingForce;
 
@@ -99,10 +106,18 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         clawRigidBody2D.AddForce(force);
     }
 
+    private void OrientClawToTarget() {
+        Vector2 clawToUserDisplacement = clawLookDirection - (Vector2) userTransform.position;
+
+        float angle = Mathf.Atan2(clawToUserDisplacement.y, clawToUserDisplacement.x) * Mathf.Rad2Deg + 90f;
+
+        clawRigidBody2D.MoveRotation(angle);
+    }
+
     private void CheckForUnintendedRelease() {
         if (anchorPoint == null) { return; }
 
-        Vector2 targetAnchorWorldPos = targetGrabbableObject.GetAnchorWorldPosition(anchorId);
+        Vector2 targetAnchorWorldPos = grabbedObject.GetAnchorWorldPosition(anchorId);
 
         float targetToAnchorPointDistance = Vector2.Distance(targetAnchorWorldPos, anchorPoint.position);
 
@@ -114,7 +129,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     private void Grab() {
         ClawClosed?.Invoke();
 
-        if (targetGrabbableObject != null || anchorPoint == null) { return; }
+        if (grabbedObject != null || anchorPoint == null) { return; }
 
         if (detector.ObjectsInRange.Count <= 0) {
             NothingGrabbed?.Invoke();
@@ -122,23 +137,23 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
             return;
         }
 
-        AssignFirstAvailableGrabbableObject();
+        AssignGrabbedObject();
 
-        targetColliders = targetGrabbableObject.GetComponentsInChildren<Collider2D>();
+        SetIgnoredCollision(userColliders, grabbedObjectColliders, true);
 
-        SetIgnoredCollision(userColliders, targetColliders, true);
-
-        targetGrabbableObject.AddAnchorPoint(anchorId, anchorPoint.position);
+        grabbedObject.AddAnchorPoint(anchorId, anchorPoint.position);
 
         GrabbedObject?.Invoke();
     }
 
-    private void AssignFirstAvailableGrabbableObject() {
+    private void AssignGrabbedObject() {
         detector.RemoveDestroyedObjects();
 
         if (detector.ObjectsInRange.Count <= 0) { return; }
 
-        targetGrabbableObject = detector.ObjectsInRange[0];
+        grabbedObject = detector.ObjectsInRange[0];
+
+        grabbedObjectColliders = grabbedObject.GetComponentsInChildren<Collider2D>();
     }
 
     private void SetIgnoredCollision(Collider2D[] collidersA, Collider2D[] collidersB, bool ignore) {
@@ -182,35 +197,34 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     private void Release() {
         ClawOpened?.Invoke();
 
-        if (targetGrabbableObject == null) { return; }
+        if (grabbedObject == null) { return; }
 
-        ReleaseTarget();
+        ReleaseGrabbedObject();
 
-        bool areObjectsOverlapping = CheckForOverlappingColliders(userColliders, targetColliders);
-
-        if (areObjectsOverlapping) {
-            StartCoroutine(CheckForOverlappingCollider(targetColliders));
-        }
-        else {
-            SetIgnoredCollision(userColliders, targetColliders, false);
-        }
+        RunCheckForOverlappingColliders();
 
         ReleasedObject?.Invoke();
     }
 
     private void UnintendedRelease() {
-        if (targetGrabbableObject == null) { return; }
+        if (grabbedObject == null) { return; }
 
-        ReleaseTarget();
+        ReleaseGrabbedObject();
+
+        RunCheckForOverlappingColliders();
 
         UnintentionallyReleased?.Invoke();
     }
 
-    private void ReleaseTarget() {
-        targetGrabbableObject.RemoveAnchorPoint(anchorId);
-        targetGrabbableObject = null;
+    private void RunCheckForOverlappingColliders() {
+        bool areObjectsOverlapping = CheckForOverlappingColliders(userColliders, grabbedObjectColliders);
 
-        targetUsableObject = null;
+        if (areObjectsOverlapping) {
+            StartCoroutine(CheckForOverlappingCollider(grabbedObjectColliders));
+        }
+        else {
+            SetIgnoredCollision(userColliders, grabbedObjectColliders, false);
+        }
     }
 
     private IEnumerator CheckForOverlappingCollider(Collider2D[] colliders) {
@@ -219,10 +233,21 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         while (areObjectsOverlapping) {
             areObjectsOverlapping = CheckForOverlappingColliders(userColliders, colliders);
 
+            Debug.Log("checking for overlaps");
+
             yield return new WaitForSeconds(overlapCheckInterval);
         }
 
         SetIgnoredCollision(userColliders, colliders, false);
+
+        Debug.Log("ended checking");
+    }
+
+    private void ReleaseGrabbedObject() {
+        grabbedObject.RemoveAnchorPoint(anchorId);
+        grabbedObject = null;
+
+        usableObject = null;
     }
 
     private void ToggleClawState() {
@@ -237,13 +262,13 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     private void TryUseGrabbedObject() {
-        if (targetGrabbableObject == null) { return; }
+        if (grabbedObject == null) { return; }
 
-        targetUsableObject = targetGrabbableObject.GetComponent<IUsableObject>();
+        usableObject = grabbedObject.GetComponent<IUsableObject>();
 
-        if (targetUsableObject == null) { return; }
+        if (usableObject == null) { return; }
 
-        targetUsableObject.Use();
+        usableObject.Use();
     }
 
     public void PrimaryUse() {
@@ -251,6 +276,10 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     public void SecondaryUse() {
+        if(grabbedObject == null) {
+            isInInteractMode = !isInInteractMode;
+        }
+
         TryUseGrabbedObject();
     }
 }
