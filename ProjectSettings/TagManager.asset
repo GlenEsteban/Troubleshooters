@@ -11,7 +11,7 @@ TagManager:
   - PostProcessing
   - Water
   - UI
-  - IgnoredColliders
+  - GroundOnlyCollider
   - Player
   - Enemy
   - Hazards

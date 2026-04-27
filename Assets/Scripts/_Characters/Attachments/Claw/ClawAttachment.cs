@@ -29,32 +29,43 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [Header("Ignored Collisions")]
     [SerializeField] private Collider2D[] grabbedObjectColliders;
     [SerializeField] private LayerMask targetLayer;
-    [SerializeField, Range(0f, 1)] private float overlapCheckInterval = 0.1f;    
+    [SerializeField, Range(0f, 1)] private float overlapCheckInterval = 0.1f;
 
-    [Header("Interact Mode Spring-Damper System")]
-    [SerializeField, Range(0f, 500)] private float stiffness = 50f;
-    [SerializeField, Range(0f, 50)] private float damping = 2f;
-    [SerializeField, Range(0f, 500)] private float maxForce = 10f;
+    [Header("Carry Mode Spring-Damper System")]
+    [SerializeField] private Vector2 returnPosition = new Vector2(0, -0.931f);
+    [SerializeField, Range(0f, 2000)] private float carryRotationSpeed = 300f;
+    [SerializeField, Range(0f, 5000)] private float carryStiffness = 1000f;
+    [SerializeField, Range(0f, 1000)] private float carryDamping = 100f;
+    [SerializeField, Range(0f, 5000)] private float carryMaxForce = 1000f;
+
+    [Header("Interact Mode Spring-Damper System")]    
+    [SerializeField, Range(0.4f, 20)] private float orientClawThreshold = 0.4f;
+    [SerializeField, Range(0f, 500)] private float interactRotationSpeed = 300f;
+    [SerializeField, Range(0f, 500)] private float interactStiffness = 300f;
+    [SerializeField, Range(0f, 50)] private float interactDamping = 50f;
+    [SerializeField, Range(0f, 500)] private float interactMaxForce = 300f;
 
     [Header("Anchor")]
     [SerializeField] private int anchorId;
     [SerializeField] private Transform anchorPoint;
 
-    [Header("Release")]
+    [Header("Thresholds")]
     [SerializeField] private float unintendedReleaseThreshold = 1f;
 
-    private GrabbableObject grabbedObject;
     private RelativeJoint2D relativeJoint2D;
+    private DistanceJoint2D distanceJoint2D;
+    private GrabbableObject grabbedObject;
 
-    private Vector2 clawLookDirection;
+
+    private Vector2 clawInteractPoint;
 
     private IUsableObject usableObject;
 
     private bool isClawClosed = false;
     private bool isInInteractMode = false;
 
-    public void SetTargetPosition(Vector2 direction) {
-        clawLookDirection = direction;
+    public void SetClawInteractPoint(Vector2 direction) {
+        clawInteractPoint = direction;
     }
 
     private void OnEnable() {
@@ -67,19 +78,25 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     private void Awake() {
         relativeJoint2D = GetComponentInChildren<RelativeJoint2D>();
+        distanceJoint2D = GetComponentInChildren<DistanceJoint2D>();
     }
 
     private void Start() {
         UpdateAnchorId();
     }
 
-    private void FixedUpdate() {
-        // Enable relative joint when not following target
-        relativeJoint2D.enabled = !isInInteractMode;
+    private void UpdateAnchorId() {
+        anchorId = CharacterManager.Instance.GetPlayerIndex(GetComponentInParent<Character>());
+    }
 
+    private void FixedUpdate() {
         if (isInInteractMode) {
-            MoveClawToTarget();
-            OrientClawToTarget();
+            MoveClawToInteractPoint();
+            OrientClawAwayFromUser();
+        }
+        else {
+            MoveClawToReturnPosition();
+            OrientClawAwayFromUser();
         }
 
         if (grabbedObject == null || anchorPoint == null) { return; }
@@ -89,29 +106,49 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         CheckForUnintendedRelease();
     }
 
-    private void UpdateAnchorId() {
-        anchorId = CharacterManager.Instance.GetPlayerIndex(GetComponentInParent<Character>());
-    }
+    private void MoveClawToReturnPosition() {
+        Vector2 targetPosition = (Vector2) userTransform.position + returnPosition;
 
-    private void MoveClawToTarget() {
-        Vector2 clawToTargetDisplacement = clawLookDirection - (Vector2) clawTransform.position;
+        Vector2 clawToPositionDisplacement = targetPosition - (Vector2) clawTransform.position;
 
-        Vector2 stiffnessForce = clawToTargetDisplacement * stiffness;
-        Vector2 dampingForce = -clawRigidBody2D.linearVelocity * damping;
+        if (clawToPositionDisplacement.magnitude < 0.1f) {
+            clawRigidBody2D.position = (Vector2) userTransform.position + returnPosition;
+            return;
+        }
+
+        Vector2 stiffnessForce = clawToPositionDisplacement * carryStiffness;
+        Vector2 dampingForce = -1 * carryDamping * clawRigidBody2D.linearVelocity;
 
         Vector2 force = stiffnessForce + dampingForce;
 
-        force = Vector2.ClampMagnitude(force, maxForce);
+        force = Vector2.ClampMagnitude(force, carryMaxForce);
 
         clawRigidBody2D.AddForce(force);
     }
 
-    private void OrientClawToTarget() {
-        Vector2 clawToUserDisplacement = clawLookDirection - (Vector2) userTransform.position;
+    private void MoveClawToInteractPoint() {
+        Vector2 clawToPositionDisplacement = clawInteractPoint - (Vector2) clawTransform.position;
+
+        Vector2 stiffnessForce = clawToPositionDisplacement * interactStiffness;
+        Vector2 dampingForce = -1 * interactDamping * clawRigidBody2D.linearVelocity ;
+
+        Vector2 force = stiffnessForce + dampingForce;
+
+        force = Vector2.ClampMagnitude(force, interactMaxForce);
+
+        clawRigidBody2D.AddForce(force);
+    }
+
+    private void OrientClawAwayFromUser() {
+        Vector2 clawToUserDisplacement = (Vector2) clawTransform.position - (Vector2) userTransform.position;
+
+        if (clawToUserDisplacement.magnitude < orientClawThreshold) { return; }
 
         float angle = Mathf.Atan2(clawToUserDisplacement.y, clawToUserDisplacement.x) * Mathf.Rad2Deg + 90f;
 
-        clawRigidBody2D.MoveRotation(angle);
+        float newAngle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation, angle, interactRotationSpeed * Time.fixedDeltaTime);
+
+        clawRigidBody2D.MoveRotation(newAngle);
     }
 
     private void CheckForUnintendedRelease() {
@@ -233,14 +270,10 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         while (areObjectsOverlapping) {
             areObjectsOverlapping = CheckForOverlappingColliders(userColliders, colliders);
 
-            Debug.Log("checking for overlaps");
-
             yield return new WaitForSeconds(overlapCheckInterval);
         }
 
         SetIgnoredCollision(userColliders, colliders, false);
-
-        Debug.Log("ended checking");
     }
 
     private void ReleaseGrabbedObject() {

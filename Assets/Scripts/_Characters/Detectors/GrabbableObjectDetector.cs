@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Processes player input to control movement, orientation,
+/// and attachment interactions.
+/// </summary>
 public class GrabbableObjectDetector : MonoBehaviour {
     public IReadOnlyList<GrabbableObject> ObjectsInRange => objectsInRange;
 

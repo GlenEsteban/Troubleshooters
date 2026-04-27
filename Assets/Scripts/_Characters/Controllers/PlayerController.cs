@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 /// Processes player input to control movement, orientation,
 /// and attachment interactions.
 /// </summary>
-
 [RequireComponent(typeof(Rigidbody2DMovement))]
 [RequireComponent(typeof(LookOrientation))]
 public class PlayerController : MonoBehaviour {
@@ -66,6 +65,6 @@ public class PlayerController : MonoBehaviour {
 
         lookOrientation.SetLookDirection(selfToMouseDisplacement.normalized);
 
-        clawAttachment.SetTargetPosition(mouseWorldPosition);
+        clawAttachment.SetClawInteractPoint(mouseWorldPosition);
     }
 }
