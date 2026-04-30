@@ -11,6 +11,9 @@ public class GrabbableObject : MonoBehaviour {
     public event Action Grabbed;
     public event Action Released;
 
+    [Header("Weight")]
+    [SerializeField, Range(0f, 9999f)] private float weight = 1000f;
+
     [Header("Spring-Damper System")]
     [SerializeField, Range(0f, 5000f)] private float stiffness = 1000f;
     [SerializeField, Range(0f, 5000f)] private float damping = 30f;
@@ -24,6 +27,12 @@ public class GrabbableObject : MonoBehaviour {
 
     private readonly Dictionary<int, AnchorPoint> anchorPoints = new Dictionary<int, AnchorPoint>();
 
+    public float GetDistributedWeight() {
+        if (anchorPoints.Count == 0) return weight;
+
+        return weight / anchorPoints.Count;
+    }
+
     public Vector2 GetAnchorWorldPosition(int anchorId) {
         return transform.TransformPoint(anchorPoints[anchorId].anchorLocalPosition);
     }
@@ -34,6 +43,8 @@ public class GrabbableObject : MonoBehaviour {
 
     private void FixedUpdate() {
         ApplyForcesAtAnchors();
+
+        print(gameObject.name + " " + GetDistributedWeight());
     }
 
     /// <summary>

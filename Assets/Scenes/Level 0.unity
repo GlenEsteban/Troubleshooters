@@ -1256,22 +1256,22 @@ MonoBehaviour:
   clawRigidBody2D: {fileID: 1040299823}
   clawTransform: {fileID: 1040299820}
   detector: {fileID: 337104077}
+  weightTolerance: 501
   grabbedObjectColliders:
   - {fileID: 1111013411}
   targetLayer:
     serializedVersion: 2
     m_Bits: 40832
   overlapCheckInterval: 0.1
-  returnPosition: {x: 0, y: -0.931}
-  carryRotationSpeed: 300
-  carryStiffness: 1250
-  carryDamping: 30
-  carryMaxForce: 1250
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 3072
+  returnPosition: {x: 0, y: -0.881}
   orientClawThreshold: 0.4
-  interactRotationSpeed: 300
-  interactStiffness: 300
-  interactDamping: 25
-  interactMaxForce: 300
+  rotationSpeed: 300
+  stiffness: 500
+  damping: 25
+  maxForce: 350
   anchorId: 0
   anchorPoint: {fileID: 337104075}
   unintendedReleaseThreshold: 1
@@ -1848,6 +1848,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  weight: 1000
   stiffness: 1000
   damping: 30
   maxForce: 1000
@@ -36907,7 +36908,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &484241849
 Transform:
   m_ObjectHideFlags: 0
@@ -37052,6 +37053,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  weight: 1000
   stiffness: 500
   damping: 10
   maxForce: 200
@@ -39074,6 +39076,7 @@ GameObject:
   - component: {fileID: 1040299823}
   - component: {fileID: 1040299821}
   - component: {fileID: 1040299825}
+  - component: {fileID: 1040299826}
   m_Layer: 6
   m_Name: Claw
   m_TagString: Untagged
@@ -39148,9 +39151,9 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDamping: 5
-  m_AngularDamping: 1
-  m_GravityScale: 0
+  m_LinearDamping: 0
+  m_AngularDamping: 5
+  m_GravityScale: 2
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -39182,6 +39185,32 @@ DistanceJoint2D:
   m_AutoConfigureDistance: 0
   m_Distance: 3
   m_MaxDistanceOnly: 1
+--- !u!233 &1040299826
+HingeJoint2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040299819}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_EnableCollision: 0
+  m_ConnectedRigidBody: {fileID: 1533485076}
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_BreakAction: 3
+  m_AutoConfigureConnectedAnchor: 1
+  m_Anchor: {x: 0, y: 0.43}
+  m_ConnectedAnchor: {x: 0, y: -0.501}
+  m_UseConnectedAnchor: 1
+  m_UseMotor: 0
+  m_Motor:
+    m_MotorSpeed: 0
+    m_MaximumMotorForce: 10000
+  m_UseLimits: 1
+  m_AngleLimits:
+    m_LowerAngle: -15
+    m_UpperAngle: 15
 --- !u!1 &1080538504
 GameObject:
   m_ObjectHideFlags: 0
@@ -39547,6 +39576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  weight: 1000
   stiffness: 1000
   damping: 30
   maxForce: 1000
@@ -44832,6 +44862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  weight: 1000
   stiffness: 1000
   damping: 30
   maxForce: 1000
@@ -56043,7 +56074,6 @@ GameObject:
   - component: {fileID: 2061801521}
   - component: {fileID: 2061801520}
   - component: {fileID: 2061801522}
-  - component: {fileID: 2061801523}
   m_Layer: 12
   m_Name: Large Crate
   m_TagString: Untagged
@@ -56123,21 +56153,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  weight: 1000
   stiffness: 1000
   damping: 100
   maxForce: 1000
---- !u!114 &2061801523
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2061801518}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 09f7e9897bd5cfd4091a2f65013a5d4f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AntigravityObject
 --- !u!1 &2101085937
 GameObject:
   m_ObjectHideFlags: 0
@@ -56406,6 +56425,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  weight: 1000
   stiffness: 1000
   damping: 30
   maxForce: 1000

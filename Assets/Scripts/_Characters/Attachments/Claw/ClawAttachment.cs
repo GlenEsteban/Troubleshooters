@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
 
@@ -26,24 +25,23 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [SerializeField] private Transform clawTransform;
     [SerializeField] private GrabbableObjectDetector detector;
 
+    [Header("Weight Tolerance")]
+    [SerializeField, Range(0f, 9999)] private float weightTolerance = 501f;
+
+
     [Header("Ignored Collisions")]
     [SerializeField] private Collider2D[] grabbedObjectColliders;
     [SerializeField] private LayerMask targetLayer;
     [SerializeField, Range(0f, 1)] private float overlapCheckInterval = 0.1f;
 
-    [Header("Carry Mode Spring-Damper System")]
-    [SerializeField] private Vector2 returnPosition = new Vector2(0, -0.931f);
-    [SerializeField, Range(0f, 2000)] private float carryRotationSpeed = 300f;
-    [SerializeField, Range(0f, 5000)] private float carryStiffness = 1000f;
-    [SerializeField, Range(0f, 1000)] private float carryDamping = 100f;
-    [SerializeField, Range(0f, 5000)] private float carryMaxForce = 1000f;
-
-    [Header("Interact Mode Spring-Damper System")]    
+    [Header("Claw Movement Spring-Damper System")]
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private Vector2 returnPosition = new Vector2(0, -0.931f);    
     [SerializeField, Range(0.4f, 20)] private float orientClawThreshold = 0.4f;
-    [SerializeField, Range(0f, 500)] private float interactRotationSpeed = 300f;
-    [SerializeField, Range(0f, 500)] private float interactStiffness = 300f;
-    [SerializeField, Range(0f, 50)] private float interactDamping = 50f;
-    [SerializeField, Range(0f, 500)] private float interactMaxForce = 300f;
+    [SerializeField, Range(0f, 500)] private float rotationSpeed = 300f;
+    [SerializeField, Range(0f, 500)] private float stiffness = 300f;
+    [SerializeField, Range(0f, 50)] private float damping = 50f;
+    [SerializeField, Range(0f, 500)] private float maxForce = 300f;
 
     [Header("Anchor")]
     [SerializeField] private int anchorId;
@@ -52,10 +50,8 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [Header("Thresholds")]
     [SerializeField] private float unintendedReleaseThreshold = 1f;
 
-    private RelativeJoint2D relativeJoint2D;
-    private DistanceJoint2D distanceJoint2D;
     private GrabbableObject grabbedObject;
-
+    private HingeJoint2D hingeJoint2D;
 
     private Vector2 clawInteractPoint;
 
@@ -77,10 +73,8 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     private void Awake() {
-        relativeJoint2D = GetComponentInChildren<RelativeJoint2D>();
-        distanceJoint2D = GetComponentInChildren<DistanceJoint2D>();
+        hingeJoint2D = GetComponentInChildren<HingeJoint2D>();
     }
-
     private void Start() {
         UpdateAnchorId();
     }
@@ -91,50 +85,72 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     private void FixedUpdate() {
         if (isInInteractMode) {
+            hingeJoint2D.enabled = false;
+
             MoveClawToInteractPoint();
             OrientClawAwayFromUser();
         }
-        else {
-            MoveClawToReturnPosition();
-            OrientClawAwayFromUser();
+        else if (!hingeJoint2D.enabled) {
+            bool isPositioned = MoveClawToReturnPosition();
+            bool isOriented = OrientClawToReturnRotation();
+
+            if (isPositioned && isOriented) {
+                hingeJoint2D.enabled = true;
+            }
         }
 
         if (grabbedObject == null || anchorPoint == null) { return; }
+
+        if (grabbedObject != null) {
+            bool isCarryingHeavyWeight = weightTolerance < grabbedObject.GetDistributedWeight();
+
+            if (isCarryingHeavyWeight) {
+                hingeJoint2D.enabled = false;
+
+                clawRigidBody2D.constraints = RigidbodyConstraints2D.FreezeAll;
+                print(isCarryingHeavyWeight);
+                return;
+            }
+        }
+        else {
+            clawRigidBody2D.constraints = RigidbodyConstraints2D.None;
+        }
 
         grabbedObject.UpdateAnchorTargetWorldPosition(anchorId, anchorPoint.position);
 
         CheckForUnintendedRelease();
     }
 
-    private void MoveClawToReturnPosition() {
+    private bool MoveClawToReturnPosition() {
         Vector2 targetPosition = (Vector2) userTransform.position + returnPosition;
 
         Vector2 clawToPositionDisplacement = targetPosition - (Vector2) clawTransform.position;
 
-        if (clawToPositionDisplacement.magnitude < 0.1f) {
-            clawRigidBody2D.position = (Vector2) userTransform.position + returnPosition;
-            return;
+        if (clawToPositionDisplacement.magnitude < 0.05f) {
+            return true;
         }
 
-        Vector2 stiffnessForce = clawToPositionDisplacement * carryStiffness;
-        Vector2 dampingForce = -1 * carryDamping * clawRigidBody2D.linearVelocity;
+        Vector2 stiffnessForce = clawToPositionDisplacement * stiffness;
+        Vector2 dampingForce = -1 * damping * clawRigidBody2D.linearVelocity;
 
         Vector2 force = stiffnessForce + dampingForce;
 
-        force = Vector2.ClampMagnitude(force, carryMaxForce);
+        force = Vector2.ClampMagnitude(force, maxForce);
 
         clawRigidBody2D.AddForce(force);
+
+        return false;
     }
 
     private void MoveClawToInteractPoint() {
         Vector2 clawToPositionDisplacement = clawInteractPoint - (Vector2) clawTransform.position;
 
-        Vector2 stiffnessForce = clawToPositionDisplacement * interactStiffness;
-        Vector2 dampingForce = -1 * interactDamping * clawRigidBody2D.linearVelocity ;
+        Vector2 stiffnessForce = clawToPositionDisplacement * stiffness;
+        Vector2 dampingForce = -1 * damping * clawRigidBody2D.linearVelocity;
 
         Vector2 force = stiffnessForce + dampingForce;
 
-        force = Vector2.ClampMagnitude(force, interactMaxForce);
+        force = Vector2.ClampMagnitude(force, maxForce);
 
         clawRigidBody2D.AddForce(force);
     }
@@ -146,9 +162,23 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
         float angle = Mathf.Atan2(clawToUserDisplacement.y, clawToUserDisplacement.x) * Mathf.Rad2Deg + 90f;
 
-        float newAngle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation, angle, interactRotationSpeed * Time.fixedDeltaTime);
+        float newAngle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation, angle, rotationSpeed * Time.fixedDeltaTime);
 
         clawRigidBody2D.MoveRotation(newAngle);
+    }
+
+    private bool OrientClawToReturnRotation() {
+        float newangle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation % 360, 0, rotationSpeed * Time.fixedDeltaTime);
+
+        clawRigidBody2D.MoveRotation(newangle);
+
+        if (newangle != 0) {
+            Debug.Log("not yet oriented");
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     private void CheckForUnintendedRelease() {
