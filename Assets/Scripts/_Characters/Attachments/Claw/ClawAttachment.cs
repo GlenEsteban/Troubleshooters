@@ -16,11 +16,11 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     public event Action ReleasedObject;
     public event Action UnintentionallyReleased;
 
-    [Header("User")]
+    [Header("User References")]
     [SerializeField] private Transform userTransform;
     [SerializeField] private Collider2D[] userColliders;
 
-    [Header("Claw")]
+    [Header("Claw References")]
     [SerializeField] private Rigidbody2D clawRigidBody2D;
     [SerializeField] private Transform clawTransform;
     [SerializeField] private GrabbableObjectDetector detector;
@@ -36,9 +36,10 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     [Header("Claw Movement Spring-Damper System")]
     [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private Vector2 returnPosition = new Vector2(0, -0.931f);    
+    [SerializeField] private Vector2 returnPosition = new Vector2(0, -0.931f);
+    [SerializeField, Range(0.01f, 20)] private float returnPositionThreshold = 0.04f;
     [SerializeField, Range(0.4f, 20)] private float orientClawThreshold = 0.4f;
-    [SerializeField, Range(0f, 500)] private float rotationSpeed = 300f;
+    [SerializeField, Range(0f, 2000)] private float rotationSpeed = 300f;
     [SerializeField, Range(0f, 500)] private float stiffness = 300f;
     [SerializeField, Range(0f, 50)] private float damping = 50f;
     [SerializeField, Range(0f, 500)] private float maxForce = 300f;
@@ -87,7 +88,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         if (isInInteractMode) {
             hingeJoint2D.enabled = false;
 
-            MoveClawToInteractPoint();
+            MoveClawToPosition(clawInteractPoint);
             OrientClawAwayFromUser();
         }
         else if (!hingeJoint2D.enabled) {
@@ -99,21 +100,20 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
             }
         }
 
-        if (grabbedObject == null || anchorPoint == null) { return; }
-
-        if (grabbedObject != null) {
-            bool isCarryingHeavyWeight = weightTolerance < grabbedObject.GetDistributedWeight();
-
-            if (isCarryingHeavyWeight) {
-                hingeJoint2D.enabled = false;
-
-                clawRigidBody2D.constraints = RigidbodyConstraints2D.FreezeAll;
-                print(isCarryingHeavyWeight);
-                return;
-            }
-        }
-        else {
+        if (grabbedObject == null || anchorPoint == null) {
             clawRigidBody2D.constraints = RigidbodyConstraints2D.None;
+
+            return;
+        }
+
+        bool isCarryingHeavyWeight = weightTolerance < grabbedObject.GetDistributedWeight();
+
+        if (isCarryingHeavyWeight) {
+            hingeJoint2D.enabled = false;
+
+            clawRigidBody2D.constraints = RigidbodyConstraints2D.FreezeAll;
+            print(isCarryingHeavyWeight);
+            return;
         }
 
         grabbedObject.UpdateAnchorTargetWorldPosition(anchorId, anchorPoint.position);
@@ -122,41 +122,21 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     private bool MoveClawToReturnPosition() {
-        Vector2 targetPosition = (Vector2) userTransform.position + returnPosition;
+        Vector2 targetPosition = (Vector2)userTransform.position + returnPosition;
 
-        Vector2 clawToPositionDisplacement = targetPosition - (Vector2) clawTransform.position;
+        Vector2 clawToPositionDisplacement = targetPosition - (Vector2)clawTransform.position;
 
-        if (clawToPositionDisplacement.magnitude < 0.05f) {
+        if (clawToPositionDisplacement.magnitude < returnPositionThreshold) {
             return true;
         }
 
-        Vector2 stiffnessForce = clawToPositionDisplacement * stiffness;
-        Vector2 dampingForce = -1 * damping * clawRigidBody2D.linearVelocity;
-
-        Vector2 force = stiffnessForce + dampingForce;
-
-        force = Vector2.ClampMagnitude(force, maxForce);
-
-        clawRigidBody2D.AddForce(force);
+        MoveClawToPosition(targetPosition);
 
         return false;
     }
 
-    private void MoveClawToInteractPoint() {
-        Vector2 clawToPositionDisplacement = clawInteractPoint - (Vector2) clawTransform.position;
-
-        Vector2 stiffnessForce = clawToPositionDisplacement * stiffness;
-        Vector2 dampingForce = -1 * damping * clawRigidBody2D.linearVelocity;
-
-        Vector2 force = stiffnessForce + dampingForce;
-
-        force = Vector2.ClampMagnitude(force, maxForce);
-
-        clawRigidBody2D.AddForce(force);
-    }
-
     private void OrientClawAwayFromUser() {
-        Vector2 clawToUserDisplacement = (Vector2) clawTransform.position - (Vector2) userTransform.position;
+        Vector2 clawToUserDisplacement = (Vector2)clawTransform.position - (Vector2)userTransform.position;
 
         if (clawToUserDisplacement.magnitude < orientClawThreshold) { return; }
 
@@ -168,18 +148,44 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     private bool OrientClawToReturnRotation() {
-        float newangle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation % 360, 0, rotationSpeed * Time.fixedDeltaTime);
+        float newangle;
+
+        // Set claw rotation between 0 and 360
+        if (clawRigidBody2D.rotation > 360 ||  clawRigidBody2D.rotation < -360) {
+            clawRigidBody2D.rotation = clawRigidBody2D.rotation % 360;
+
+            if (clawRigidBody2D.rotation < 0) {
+                clawRigidBody2D.rotation += 360;
+            }
+        }
+
+        print(clawRigidBody2D.rotation);
+
+        if (clawRigidBody2D.rotation > 180) {
+            newangle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation, 0, rotationSpeed * Time.fixedDeltaTime);
+        }
+        else {
+            newangle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation, 360, rotationSpeed * Time.fixedDeltaTime);
+        }
 
         clawRigidBody2D.MoveRotation(newangle);
 
-        if (newangle != 0) {
-            Debug.Log("not yet oriented");
-            return false;
-        }
-        else {
-            return true;
-        }
+        return newangle == 0 || newangle == 360;
     }
+
+    private void MoveClawToPosition(Vector2 position) {
+        Vector2 clawToPositionDisplacement = position - (Vector2)clawTransform.position;
+
+        Vector2 stiffnessForce = clawToPositionDisplacement * stiffness;
+        Vector2 dampingForce = -1 * damping * clawRigidBody2D.linearVelocity;
+
+        Vector2 force = stiffnessForce + dampingForce;
+
+        force = Vector2.ClampMagnitude(force, maxForce);
+
+        clawRigidBody2D.AddForce(force);
+    }
+
 
     private void CheckForUnintendedRelease() {
         if (anchorPoint == null) { return; }
@@ -235,32 +241,6 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         }
     }
 
-    private bool CheckForOverlappingColliders(Collider2D[] collidersA, Collider2D[] collidersB) {
-        ContactFilter2D filter = new ContactFilter2D();
-        filter.SetLayerMask(targetLayer);
-        filter.useTriggers = false;
-
-        Collider2D[] results = new Collider2D[10];
-
-        foreach (Collider2D colliderA in collidersA) {
-            if (colliderA == null) continue;
-
-            int overlapCount = colliderA.Overlap(filter, results);
-
-            for (int i = 0; i < overlapCount; i++) {
-                for (int j = 0; j < collidersB.Length; j++) {
-                    if (collidersB[j].isTrigger) continue;
-
-                    if (results[i] == collidersB[j]) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
     private void Release() {
         ClawOpened?.Invoke();
 
@@ -281,6 +261,13 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         RunCheckForOverlappingColliders();
 
         UnintentionallyReleased?.Invoke();
+    }
+
+    private void ReleaseGrabbedObject() {
+        grabbedObject.RemoveAnchorPoint(anchorId);
+        grabbedObject = null;
+
+        usableObject = null;
     }
 
     private void RunCheckForOverlappingColliders() {
@@ -306,11 +293,30 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         SetIgnoredCollision(userColliders, colliders, false);
     }
 
-    private void ReleaseGrabbedObject() {
-        grabbedObject.RemoveAnchorPoint(anchorId);
-        grabbedObject = null;
+    private bool CheckForOverlappingColliders(Collider2D[] collidersA, Collider2D[] collidersB) {
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.SetLayerMask(targetLayer);
+        filter.useTriggers = false;
 
-        usableObject = null;
+        Collider2D[] results = new Collider2D[10];
+
+        foreach (Collider2D colliderA in collidersA) {
+            if (colliderA == null) continue;
+
+            int overlapCount = colliderA.Overlap(filter, results);
+
+            for (int i = 0; i < overlapCount; i++) {
+                for (int j = 0; j < collidersB.Length; j++) {
+                    if (collidersB[j].isTrigger) continue;
+
+                    if (results[i] == collidersB[j]) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     private void ToggleClawState() {

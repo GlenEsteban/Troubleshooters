@@ -43,8 +43,6 @@ public class GrabbableObject : MonoBehaviour {
 
     private void FixedUpdate() {
         ApplyForcesAtAnchors();
-
-        print(gameObject.name + " " + GetDistributedWeight());
     }
 
     /// <summary>
