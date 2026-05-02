@@ -153,24 +153,24 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         // Set claw rotation between 0 and 360
         if (clawRigidBody2D.rotation > 360 ||  clawRigidBody2D.rotation < -360) {
             clawRigidBody2D.rotation = clawRigidBody2D.rotation % 360;
-
-            if (clawRigidBody2D.rotation < 0) {
-                clawRigidBody2D.rotation += 360;
-            }
         }
 
-        print(clawRigidBody2D.rotation);
+        // Change negative angles to positive
+        if (clawRigidBody2D.rotation < 0) {
+            clawRigidBody2D.rotation += 360;
+        }
 
+        // Rotate left or right based on angle
         if (clawRigidBody2D.rotation > 180) {
-            newangle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation, 0, rotationSpeed * Time.fixedDeltaTime);
+            newangle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation, 360, rotationSpeed * Time.fixedDeltaTime);
         }
         else {
-            newangle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation, 360, rotationSpeed * Time.fixedDeltaTime);
+            newangle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation, 0, rotationSpeed * Time.fixedDeltaTime);
         }
 
         clawRigidBody2D.MoveRotation(newangle);
 
-        return newangle == 0 || newangle == 360;
+        return newangle == 0 || newangle == -360;
     }
 
     private void MoveClawToPosition(Vector2 position) {
