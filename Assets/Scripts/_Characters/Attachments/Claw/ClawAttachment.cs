@@ -28,7 +28,6 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [Header("Weight Tolerance")]
     [SerializeField, Range(0f, 9999)] private float weightTolerance = 501f;
 
-
     [Header("Ignored Collisions")]
     [SerializeField] private Collider2D[] grabbedObjectColliders;
     [SerializeField] private LayerMask targetLayer;
@@ -37,7 +36,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [Header("Claw Movement Spring-Damper System")]
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Vector2 returnPosition = new Vector2(0, -0.931f);
-    [SerializeField, Range(0.01f, 20)] private float returnPositionThreshold = 0.04f;
+    [SerializeField, Range(0.04f, 20)] private float returnPositionThreshold = 0.04f;
     [SerializeField, Range(0.4f, 20)] private float orientClawThreshold = 0.4f;
     [SerializeField, Range(0f, 2000)] private float rotationSpeed = 300f;
     [SerializeField, Range(0f, 500)] private float stiffness = 300f;
@@ -55,6 +54,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     private HingeJoint2D hingeJoint2D;
 
     private Vector2 clawInteractPoint;
+    private Vector2 interactPointMoveDirection;
 
     private IUsableObject usableObject;
 
@@ -63,6 +63,9 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     public void SetClawInteractPoint(Vector2 direction) {
         clawInteractPoint = direction;
+    }
+    public void SetInteractPointMoveDirection(Vector2 direction) {
+        interactPointMoveDirection = direction;
     }
 
     private void OnEnable() {
@@ -88,7 +91,14 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         if (isInInteractMode) {
             hingeJoint2D.enabled = false;
 
-            MoveClawToPosition(clawInteractPoint);
+            if (interactPointMoveDirection != Vector2.zero) {
+                Vector2 targetPosition = (Vector2)clawTransform.position + interactPointMoveDirection;
+                MoveClawToPosition(targetPosition);
+            }
+            else {
+                MoveClawToPosition(clawInteractPoint);
+            }
+
             OrientClawAwayFromUser();
         }
         else if (!hingeJoint2D.enabled) {
@@ -112,8 +122,12 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
             hingeJoint2D.enabled = false;
 
             clawRigidBody2D.constraints = RigidbodyConstraints2D.FreezeAll;
-            print(isCarryingHeavyWeight);
+            print("isCarryingHeavyWeight");
             return;
+        }
+        else {
+            clawRigidBody2D.constraints = RigidbodyConstraints2D.None;
+            print("distributed");
         }
 
         grabbedObject.UpdateAnchorTargetWorldPosition(anchorId, anchorPoint.position);
@@ -131,7 +145,6 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         }
 
         MoveClawToPosition(targetPosition);
-
         return false;
     }
 
@@ -148,29 +161,21 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     private bool OrientClawToReturnRotation() {
-        float newangle;
-
-        // Set claw rotation between 0 and 360
-        if (clawRigidBody2D.rotation > 360 ||  clawRigidBody2D.rotation < -360) {
-            clawRigidBody2D.rotation = clawRigidBody2D.rotation % 360;
+        if (clawRigidBody2D.rotation > 360 || clawRigidBody2D.rotation < -360) {
+            clawRigidBody2D.rotation %= 360;
         }
 
-        // Change negative angles to positive
-        if (clawRigidBody2D.rotation < 0) {
-            clawRigidBody2D.rotation += 360;
-        }
+        float signedAngle = Mathf.DeltaAngle(0f, clawRigidBody2D.rotation);
 
-        // Rotate left or right based on angle
-        if (clawRigidBody2D.rotation > 180) {
-            newangle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation, 360, rotationSpeed * Time.fixedDeltaTime);
-        }
-        else {
-            newangle = Mathf.MoveTowardsAngle(clawRigidBody2D.rotation, 0, rotationSpeed * Time.fixedDeltaTime);
-        }
+        clawRigidBody2D.rotation = signedAngle;
 
-        clawRigidBody2D.MoveRotation(newangle);
+        float targetAngle = 0f;
 
-        return newangle == 0 || newangle == -360;
+        float newAngle = Mathf.MoveTowards(signedAngle, targetAngle, rotationSpeed * Time.fixedDeltaTime);
+
+        clawRigidBody2D.MoveRotation(newAngle);
+
+        return Mathf.Abs(Mathf.DeltaAngle(clawRigidBody2D.rotation, targetAngle)) < 0.1f;
     }
 
     private void MoveClawToPosition(Vector2 position) {
@@ -345,10 +350,18 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     public void SecondaryUse() {
-        if(grabbedObject == null) {
-            isInInteractMode = !isInInteractMode;
-        }
+        //if (grabbedObject == null) {
+        //    ToggleInteractMode();
+        //}
 
         TryUseGrabbedObject();
+    }
+
+    public void ToggleInteractMode() {
+        isInInteractMode = !isInInteractMode;
+    }
+
+    public void SetInteractMode(bool enabled) {
+        isInInteractMode = enabled;
     }
 }

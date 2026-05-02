@@ -1849,7 +1849,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
-  weight: 1000
+  weight: 1
   stiffness: 1000
   damping: 30
   maxForce: 1000
@@ -36938,6 +36938,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MouseGrabber
   cam: {fileID: 519420031}
+  anchorID: 999
+  grabbedObject: {fileID: 0}
 --- !u!1 &488336178
 GameObject:
   m_ObjectHideFlags: 0
@@ -37054,7 +37056,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
-  weight: 1000
+  weight: 1
   stiffness: 500
   damping: 10
   maxForce: 200
@@ -39577,7 +39579,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69c88dfaaadc414f8d6ac3cd4aa450c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
-  weight: 1000
+  weight: 1
   stiffness: 1000
   damping: 30
   maxForce: 1000

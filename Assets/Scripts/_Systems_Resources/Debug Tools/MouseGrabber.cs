@@ -5,10 +5,8 @@ using UnityEngine;
 /// </summary>
 public class MouseGrabber : MonoBehaviour {
     [SerializeField] private Camera cam;
-
-    private GrabbableObject grabbedObject;
-
-    private int anchorID = 999; 
+    [SerializeField] private int anchorID = -999;
+    [SerializeField] private GrabbableObject grabbedObject;
 
     void Update() {
         // TEMP: INPUT FOR TESTING GRAB FUNCTIONALITY

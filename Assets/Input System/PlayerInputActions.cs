@@ -102,6 +102,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""SwitchClawMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""a335151b-39a3-4966-8d9b-8ebb5d8df5c3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MoveInteractPoint"",
+                    ""type"": ""Value"",
+                    ""id"": ""e09b35a0-07f1-46f0-aafa-9accc932818d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
                     ""name"": ""AttachmentPrimaryUse"",
                     ""type"": ""Button"",
                     ""id"": ""3054efc3-a379-42df-bc1b-af69e9fc45b2"",
@@ -305,6 +323,39 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""XR"",
                     ""action"": ""AttachmentSecondaryUse"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f382a47f-98ae-43c4-943d-4125a7799244"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SwitchClawMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""68359b8e-5194-4bd0-99db-e8e98b70ad8d"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SwitchClawMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a56a71f8-c028-4ef2-a6ea-d8f6346642b2"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveInteractPoint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -893,6 +944,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
+        m_Player_SwitchClawMode = m_Player.FindAction("SwitchClawMode", throwIfNotFound: true);
+        m_Player_MoveInteractPoint = m_Player.FindAction("MoveInteractPoint", throwIfNotFound: true);
         m_Player_AttachmentPrimaryUse = m_Player.FindAction("AttachmentPrimaryUse", throwIfNotFound: true);
         m_Player_AttachmentSecondaryUse = m_Player.FindAction("AttachmentSecondaryUse", throwIfNotFound: true);
         // UI
@@ -989,6 +1042,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Player;
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Move;
+    private readonly InputAction m_Player_SwitchClawMode;
+    private readonly InputAction m_Player_MoveInteractPoint;
     private readonly InputAction m_Player_AttachmentPrimaryUse;
     private readonly InputAction m_Player_AttachmentSecondaryUse;
     /// <summary>
@@ -1006,6 +1061,14 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Move".
         /// </summary>
         public InputAction @Move => m_Wrapper.m_Player_Move;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/SwitchClawMode".
+        /// </summary>
+        public InputAction @SwitchClawMode => m_Wrapper.m_Player_SwitchClawMode;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/MoveInteractPoint".
+        /// </summary>
+        public InputAction @MoveInteractPoint => m_Wrapper.m_Player_MoveInteractPoint;
         /// <summary>
         /// Provides access to the underlying input action "Player/AttachmentPrimaryUse".
         /// </summary>
@@ -1043,6 +1106,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Move.started += instance.OnMove;
             @Move.performed += instance.OnMove;
             @Move.canceled += instance.OnMove;
+            @SwitchClawMode.started += instance.OnSwitchClawMode;
+            @SwitchClawMode.performed += instance.OnSwitchClawMode;
+            @SwitchClawMode.canceled += instance.OnSwitchClawMode;
+            @MoveInteractPoint.started += instance.OnMoveInteractPoint;
+            @MoveInteractPoint.performed += instance.OnMoveInteractPoint;
+            @MoveInteractPoint.canceled += instance.OnMoveInteractPoint;
             @AttachmentPrimaryUse.started += instance.OnAttachmentPrimaryUse;
             @AttachmentPrimaryUse.performed += instance.OnAttachmentPrimaryUse;
             @AttachmentPrimaryUse.canceled += instance.OnAttachmentPrimaryUse;
@@ -1063,6 +1132,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Move.started -= instance.OnMove;
             @Move.performed -= instance.OnMove;
             @Move.canceled -= instance.OnMove;
+            @SwitchClawMode.started -= instance.OnSwitchClawMode;
+            @SwitchClawMode.performed -= instance.OnSwitchClawMode;
+            @SwitchClawMode.canceled -= instance.OnSwitchClawMode;
+            @MoveInteractPoint.started -= instance.OnMoveInteractPoint;
+            @MoveInteractPoint.performed -= instance.OnMoveInteractPoint;
+            @MoveInteractPoint.canceled -= instance.OnMoveInteractPoint;
             @AttachmentPrimaryUse.started -= instance.OnAttachmentPrimaryUse;
             @AttachmentPrimaryUse.performed -= instance.OnAttachmentPrimaryUse;
             @AttachmentPrimaryUse.canceled -= instance.OnAttachmentPrimaryUse;
@@ -1376,6 +1451,20 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMove(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SwitchClawMode" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSwitchClawMode(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MoveInteractPoint" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMoveInteractPoint(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "AttachmentPrimaryUse" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

@@ -16,6 +16,24 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "SwitchClawMode",
+                    "type": "Button",
+                    "id": "a335151b-39a3-4966-8d9b-8ebb5d8df5c3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "MoveInteractPoint",
+                    "type": "Value",
+                    "id": "e09b35a0-07f1-46f0-aafa-9accc932818d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "AttachmentPrimaryUse",
                     "type": "Button",
                     "id": "3054efc3-a379-42df-bc1b-af69e9fc45b2",
@@ -219,6 +237,39 @@
                     "processors": "",
                     "groups": "XR",
                     "action": "AttachmentSecondaryUse",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f382a47f-98ae-43c4-943d-4125a7799244",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SwitchClawMode",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "68359b8e-5194-4bd0-99db-e8e98b70ad8d",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SwitchClawMode",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a56a71f8-c028-4ef2-a6ea-d8f6346642b2",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MoveInteractPoint",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

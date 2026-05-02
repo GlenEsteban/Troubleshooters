@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Windows;
 
 /// <summary>
 /// Processes player input to control movement, orientation,
@@ -10,11 +11,13 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour {
     [SerializeField] private Transform playerCenter;
     private PlayerInputActions playerInputActions;
+    private InputDevice currentDevice;
     private Rigidbody2DMovement rigidBody2DMovement;
     private LookOrientation lookOrientation;
 
     private ClawAttachment clawAttachment;
 
+    private Vector2 interactPointMoveDirection;
 
     private void Awake() {
         playerInputActions = new PlayerInputActions();
@@ -30,6 +33,10 @@ public class PlayerController : MonoBehaviour {
 
         playerInputActions.Player.Move.performed += Move;
         playerInputActions.Player.Move.canceled += Move;
+        playerInputActions.Player.SwitchClawMode.performed += SwitchClawMode;
+        playerInputActions.Player.SwitchClawMode.canceled += SwitchClawMode;
+        playerInputActions.Player.MoveInteractPoint.performed += MoveInteractPoint;
+        playerInputActions.Player.MoveInteractPoint.canceled += MoveInteractPoint;
         playerInputActions.Player.AttachmentPrimaryUse.performed += AttachmentPrimaryUse;
         playerInputActions.Player.AttachmentSecondaryUse.performed += AttachmentSecondaryUse;
     }
@@ -39,32 +46,85 @@ public class PlayerController : MonoBehaviour {
 
         playerInputActions.Player.Move.performed -= Move;
         playerInputActions.Player.Move.canceled -= Move;
+        playerInputActions.Player.SwitchClawMode.performed -= SwitchClawMode;
+        playerInputActions.Player.SwitchClawMode.canceled -= SwitchClawMode;
+        playerInputActions.Player.MoveInteractPoint.performed -= MoveInteractPoint;
+        playerInputActions.Player.MoveInteractPoint.canceled -= MoveInteractPoint;
         playerInputActions.Player.AttachmentPrimaryUse.performed -= AttachmentPrimaryUse;
         playerInputActions.Player.AttachmentSecondaryUse.performed -= AttachmentSecondaryUse;
     }
 
+    private void Update() {
+        if (currentDevice is Mouse || currentDevice is Keyboard) {
+            Vector2 mouseScreenPosition = Mouse.current.position.ReadValue();
+            Vector2 mouseWorldPosition = Camera.main.ScreenToWorldPoint(mouseScreenPosition);
+
+            Vector2 selfToMouseDisplacement = mouseWorldPosition - (Vector2)playerCenter.transform.position;
+
+            lookOrientation.SetLookDirection(selfToMouseDisplacement.normalized);
+
+            clawAttachment.SetClawInteractPoint(mouseWorldPosition);
+        }
+
+        if (currentDevice is Gamepad) {
+            clawAttachment.SetInteractPointMoveDirection(interactPointMoveDirection);
+            print(interactPointMoveDirection);
+        }
+    }
+
     private void Move(InputAction.CallbackContext context) {
+        if (context.performed) {
+            currentDevice = context.control.device;
+        }
+
         Vector2 moveDirection = context.ReadValue<Vector2>();
 
         rigidBody2DMovement.SetMoveDirection(moveDirection);
     }
 
+    private void SwitchClawMode(InputAction.CallbackContext context) {
+        if (context.performed) {
+            currentDevice = context.control.device;
+        }
+
+        if (context.performed) {
+            clawAttachment.ToggleInteractMode();
+        }        
+    }
+
+    private void MoveInteractPoint(InputAction.CallbackContext context) {
+        if (context.performed) {
+            currentDevice = context.control.device;
+        }
+
+        Vector2 lookDirection = context.ReadValue<Vector2>();
+
+        lookOrientation.SetLookDirection(lookDirection);
+
+        if (context.performed) {
+            clawAttachment.SetInteractMode(true);
+            interactPointMoveDirection = context.ReadValue<Vector2>();
+        }
+
+        if (context.canceled) {
+            clawAttachment.SetInteractMode(false);
+            interactPointMoveDirection = context.ReadValue<Vector2>();
+        }
+    }
+
     private void AttachmentPrimaryUse(InputAction.CallbackContext context) {
+        if (context.performed) {
+            currentDevice = context.control.device;
+        }
+
         clawAttachment?.PrimaryUse();
     }
 
     private void AttachmentSecondaryUse(InputAction.CallbackContext context) {
+        if (context.performed) {
+            currentDevice = context.control.device;
+        }
+
         clawAttachment.SecondaryUse();
-    }
-
-    private void Update() {
-        Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
-        Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(mouseScreenPos);
-
-        Vector2 selfToMouseDisplacement = mouseWorldPosition - playerCenter.transform.position;
-
-        lookOrientation.SetLookDirection(selfToMouseDisplacement.normalized);
-
-        clawAttachment.SetClawInteractPoint(mouseWorldPosition);
     }
 }
