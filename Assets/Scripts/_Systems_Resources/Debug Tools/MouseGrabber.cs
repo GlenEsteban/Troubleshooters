@@ -1,12 +1,13 @@
 using UnityEngine;
 
 /// <summary>
-/// Debug tool that enables mouse grab functionality.
+/// Debug tool that enables mouse to grab grabbable objects.
 /// </summary>
 public class MouseGrabber : MonoBehaviour {
     [SerializeField] private Camera cam;
     [SerializeField] private int anchorID = -999;
-    [SerializeField] private GrabbableObject grabbedObject;
+
+    private GrabbableObject grabbedObject;
 
     void Update() {
         // TEMP: INPUT FOR TESTING GRAB FUNCTIONALITY
@@ -25,9 +26,6 @@ public class MouseGrabber : MonoBehaviour {
         }
     }
 
-    /// <summary>
-    /// Checks for grabbable objects at the given world position and adds an anchor point.
-    /// </summary>
     void TryGrab(Vector2 worldPos) {
         Collider2D[] hits = Physics2D.OverlapPointAll(worldPos);
 
@@ -40,6 +38,8 @@ public class MouseGrabber : MonoBehaviour {
 
             grabbedObject = grabbable;
             grabbedObject.AddAnchorPoint(anchorID, worldPos);
+
+            return;
         }
     }
 

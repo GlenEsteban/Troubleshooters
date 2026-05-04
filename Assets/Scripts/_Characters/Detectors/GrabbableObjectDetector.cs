@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Processes player input to control movement, orientation,
-/// and attachment interactions.
+/// Tracks nearby GrabbableObjects via trigger events, maintaining a read-only list
+/// of valid objects in range while excluding itself and cleaning up destroyed references.
 /// </summary>
 public class GrabbableObjectDetector : MonoBehaviour {
     public IReadOnlyList<GrabbableObject> ObjectsInRange => objectsInRange;
@@ -46,7 +46,15 @@ public class GrabbableObjectDetector : MonoBehaviour {
         }
     }
 
-    public void RemoveDestroyedObjects() {
+    private void RemoveDestroyedObjects() {
         objectsInRange.RemoveAll(item => item == null);
+    }
+
+    public GrabbableObject GetFirstGrabbableObject() {
+        RemoveDestroyedObjects();
+
+        if (ObjectsInRange.Count <= 0) { return null; }
+
+        return objectsInRange[0];
     }
 }

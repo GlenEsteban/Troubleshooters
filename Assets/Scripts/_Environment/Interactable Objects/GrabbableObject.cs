@@ -20,6 +20,7 @@ public class GrabbableObject : MonoBehaviour {
     [SerializeField, Range(0f, 5000f)] private float maxForce = 1000f;
 
     private Rigidbody2D rb;
+
     private class AnchorPoint {
         public Vector2 anchorLocalPosition;
         public Vector2 targetWorldPosition;
@@ -28,7 +29,7 @@ public class GrabbableObject : MonoBehaviour {
     private readonly Dictionary<int, AnchorPoint> anchorPoints = new Dictionary<int, AnchorPoint>();
 
     public float GetDistributedWeight() {
-        if (anchorPoints.Count == 0) return weight;
+        if (anchorPoints.Count == 0) { return weight; }
 
         return weight / anchorPoints.Count;
     }
@@ -45,10 +46,6 @@ public class GrabbableObject : MonoBehaviour {
         ApplyForcesAtAnchors();
     }
 
-    /// <summary>
-    /// Applies spring and damping forces at each anchor point,
-    /// pulling them toward their target positions while reducing oscillation.
-    /// </summary>
     private void ApplyForcesAtAnchors() {
         foreach (AnchorPoint anchorPoint in anchorPoints.Values) {
             Vector2 anchorWorldPosition = transform.TransformPoint(anchorPoint.anchorLocalPosition);

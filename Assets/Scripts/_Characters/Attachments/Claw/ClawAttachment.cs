@@ -243,11 +243,9 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     private void AssignGrabbedObject() {
-        detector.RemoveDestroyedObjects();
+        grabbedObject = detector.GetFirstGrabbableObject();
 
-        if (detector.ObjectsInRange.Count <= 0) { return; }
-
-        grabbedObject = detector.ObjectsInRange[0];
+        if (grabbedObject == null) { return; }
 
         grabbedObjectColliders = grabbedObject.GetComponentsInChildren<Collider2D>();
     }
