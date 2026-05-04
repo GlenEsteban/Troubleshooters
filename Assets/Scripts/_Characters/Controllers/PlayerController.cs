@@ -56,6 +56,8 @@ public class PlayerController : MonoBehaviour {
 
     private void Update() {
         if (currentDevice is Mouse || currentDevice is Keyboard) {
+            clawAttachment.SetIsMovingInteractPoint(false);
+
             Vector2 mouseScreenPosition = Mouse.current.position.ReadValue();
             Vector2 mouseWorldPosition = Camera.main.ScreenToWorldPoint(mouseScreenPosition);
 
@@ -77,6 +79,12 @@ public class PlayerController : MonoBehaviour {
             currentDevice = context.control.device;
         }
 
+        if (currentDevice is Gamepad) {
+            Vector2 lookDirection = context.ReadValue<Vector2>();
+
+            lookOrientation.SetLookDirection(lookDirection);
+        }
+
         Vector2 moveDirection = context.ReadValue<Vector2>();
 
         rigidBody2DMovement.SetMoveDirection(moveDirection);
@@ -85,46 +93,34 @@ public class PlayerController : MonoBehaviour {
     private void SwitchClawMode(InputAction.CallbackContext context) {
         if (context.performed) {
             currentDevice = context.control.device;
-        }
 
-        if (context.performed) {
             clawAttachment.ToggleInteractMode();
-        }        
+        }   
     }
 
     private void MoveInteractPoint(InputAction.CallbackContext context) {
         if (context.performed) {
             currentDevice = context.control.device;
+
+            clawAttachment.SetIsMovingInteractPoint(true);
         }
 
-        Vector2 lookDirection = context.ReadValue<Vector2>();
-
-        lookOrientation.SetLookDirection(lookDirection);
-
-        if (context.performed) {
-            clawAttachment.SetInteractMode(true);
-            interactPointMoveDirection = context.ReadValue<Vector2>();
-        }
-
-        if (context.canceled) {
-            clawAttachment.SetInteractMode(false);
-            interactPointMoveDirection = context.ReadValue<Vector2>();
-        }
+        interactPointMoveDirection = context.ReadValue<Vector2>();
     }
 
     private void AttachmentPrimaryUse(InputAction.CallbackContext context) {
         if (context.performed) {
             currentDevice = context.control.device;
-        }
 
-        clawAttachment?.PrimaryUse();
+            clawAttachment?.PrimaryUse();
+        }
     }
 
     private void AttachmentSecondaryUse(InputAction.CallbackContext context) {
         if (context.performed) {
             currentDevice = context.control.device;
-        }
 
-        clawAttachment.SecondaryUse();
+            clawAttachment.SecondaryUse();
+        }
     }
 }

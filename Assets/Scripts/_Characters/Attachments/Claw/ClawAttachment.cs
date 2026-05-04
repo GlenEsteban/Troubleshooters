@@ -36,8 +36,9 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [Header("Claw Movement Spring-Damper System")]
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Vector2 returnPosition = new Vector2(0, -0.931f);
+    [SerializeField, Range(1f, 100)] private float moveInteractPointSpeed = 50f;
     [SerializeField, Range(0.04f, 20)] private float returnPositionThreshold = 0.04f;
-    [SerializeField, Range(0.4f, 20)] private float orientClawThreshold = 0.4f;
+    [SerializeField, Range(0.01f, 20)] private float orientClawThreshold = 0.4f;
     [SerializeField, Range(0f, 2000)] private float rotationSpeed = 300f;
     [SerializeField, Range(0f, 500)] private float stiffness = 300f;
     [SerializeField, Range(0f, 50)] private float damping = 50f;
@@ -58,12 +59,20 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     private IUsableObject usableObject;
 
+    private float defaultClawGravityScale;
+
     private bool isClawClosed = false;
     private bool isInInteractMode = false;
+    private bool isMovingInteractPoint = false;
+
+    public void SetIsMovingInteractPoint(bool state) {
+        isMovingInteractPoint = state;
+    }
 
     public void SetClawInteractPoint(Vector2 direction) {
         clawInteractPoint = direction;
     }
+
     public void SetInteractPointMoveDirection(Vector2 direction) {
         interactPointMoveDirection = direction;
     }
@@ -81,6 +90,8 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
     private void Start() {
         UpdateAnchorId();
+
+        defaultClawGravityScale = clawRigidBody2D.gravityScale;
     }
 
     private void UpdateAnchorId() {
@@ -91,17 +102,25 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         if (isInInteractMode) {
             hingeJoint2D.enabled = false;
 
-            if (interactPointMoveDirection != Vector2.zero) {
-                Vector2 targetPosition = (Vector2)clawTransform.position + interactPointMoveDirection;
+            if (isMovingInteractPoint) {
+                clawRigidBody2D.gravityScale = 0f;
+
+
+                Vector2 targetPosition = (Vector2)clawTransform.position + interactPointMoveDirection * moveInteractPointSpeed * Time.fixedDeltaTime;
+
                 MoveClawToPosition(targetPosition);
             }
             else {
+                clawRigidBody2D.gravityScale = defaultClawGravityScale;
+
                 MoveClawToPosition(clawInteractPoint);
             }
 
             OrientClawAwayFromUser();
         }
         else if (!hingeJoint2D.enabled) {
+            clawRigidBody2D.gravityScale = defaultClawGravityScale;
+
             bool isPositioned = MoveClawToReturnPosition();
             bool isOriented = OrientClawToReturnRotation();
 
@@ -121,7 +140,6 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         if (isCarryingHeavyWeight) {
             hingeJoint2D.enabled = false;
 
-            clawRigidBody2D.constraints = RigidbodyConstraints2D.FreezeAll;
             print("isCarryingHeavyWeight");
             return;
         }
@@ -350,10 +368,6 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     public void SecondaryUse() {
-        //if (grabbedObject == null) {
-        //    ToggleInteractMode();
-        //}
-
         TryUseGrabbedObject();
     }
 
@@ -363,5 +377,11 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     public void SetInteractMode(bool enabled) {
         isInInteractMode = enabled;
+
+        if (!enabled) {
+            Release();
+
+            isMovingInteractPoint = false;
+        }
     }
 }

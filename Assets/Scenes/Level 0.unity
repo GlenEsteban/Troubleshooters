@@ -1267,6 +1267,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 3072
   returnPosition: {x: 0, y: -0.881}
+  moveInteractPointSpeed: 20
   returnPositionThreshold: 0.04
   orientClawThreshold: 0.4
   rotationSpeed: 1000
@@ -1275,7 +1276,7 @@ MonoBehaviour:
   maxForce: 350
   anchorId: 0
   anchorPoint: {fileID: 337104075}
-  unintendedReleaseThreshold: 1
+  unintendedReleaseThreshold: 1.5
 --- !u!1 &325557986
 GameObject:
   m_ObjectHideFlags: 0
@@ -36909,7 +36910,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &484241849
 Transform:
   m_ObjectHideFlags: 0
@@ -39154,7 +39155,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDamping: 0
+  m_LinearDamping: 1
   m_AngularDamping: 10
   m_GravityScale: 2
   m_Material: {fileID: 0}
