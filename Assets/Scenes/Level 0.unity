@@ -1187,6 +1187,8 @@ GameObject:
   - component: {fileID: 277600881}
   - component: {fileID: 277600879}
   - component: {fileID: 277600878}
+  - component: {fileID: 277600882}
+  - component: {fileID: 277600883}
   m_Layer: 7
   m_Name: Claw Attachment
   m_TagString: Untagged
@@ -1256,6 +1258,9 @@ MonoBehaviour:
   clawRigidBody2D: {fileID: 1040299823}
   clawTransform: {fileID: 1040299820}
   detector: {fileID: 337104077}
+  anchorId: 0
+  anchorPoint: {fileID: 337104075}
+  unintendedReleaseThreshold: 1.5
   weightTolerance: 501
   grabbedObjectColliders:
   - {fileID: 1111013411}
@@ -1274,9 +1279,31 @@ MonoBehaviour:
   stiffness: 500
   damping: 25
   maxForce: 350
-  anchorId: 0
-  anchorPoint: {fileID: 337104075}
-  unintendedReleaseThreshold: 1.5
+--- !u!114 &277600882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277600876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ade7341d367f074a9d13d4e7ee8924d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  useTriggers: 0
+--- !u!114 &277600883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277600876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c27b22e5bc2b8f4ea50ffe6c8bfb3c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
 --- !u!1 &325557986
 GameObject:
   m_ObjectHideFlags: 0
@@ -36940,7 +36967,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MouseGrabber
   cam: {fileID: 519420031}
   anchorID: 999
-  grabbedObject: {fileID: 0}
 --- !u!1 &488336178
 GameObject:
   m_ObjectHideFlags: 0

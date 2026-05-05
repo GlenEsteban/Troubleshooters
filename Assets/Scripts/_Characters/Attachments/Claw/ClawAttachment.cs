@@ -25,6 +25,11 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [SerializeField] private Transform clawTransform;
     [SerializeField] private GrabbableObjectDetector detector;
 
+    [Header("Anchor")]
+    [SerializeField] private int anchorId;
+    [SerializeField] private Transform anchorPoint;
+    [SerializeField] private float unintendedReleaseThreshold = 1f;
+
     [Header("Weight Tolerance")]
     [SerializeField, Range(0f, 9999)] private float weightTolerance = 501f;
 
@@ -44,15 +49,9 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [SerializeField, Range(0f, 50)] private float damping = 50f;
     [SerializeField, Range(0f, 500)] private float maxForce = 300f;
 
-    [Header("Anchor")]
-    [SerializeField] private int anchorId;
-    [SerializeField] private Transform anchorPoint;
-
-    [Header("Thresholds")]
-    [SerializeField] private float unintendedReleaseThreshold = 1f;
-
     private GrabbableObject grabbedObject;
     private HingeJoint2D hingeJoint2D;
+    private ObjectCollisionPhasing objectCollisionPhasing;
 
     private Vector2 clawInteractPoint;
     private Vector2 interactPointMoveDirection;
@@ -63,10 +62,10 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     private bool isClawClosed = false;
     private bool isInInteractMode = false;
-    private bool isMovingInteractPoint = false;
+    private bool isUsingStickBasedClawMovement = false;
 
     public void SetIsMovingInteractPoint(bool state) {
-        isMovingInteractPoint = state;
+        isUsingStickBasedClawMovement = state;
     }
 
     public void SetClawInteractPoint(Vector2 direction) {
@@ -87,6 +86,8 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     private void Awake() {
         hingeJoint2D = GetComponentInChildren<HingeJoint2D>();
+
+        objectCollisionPhasing = GetComponent<ObjectCollisionPhasing>();
     }
     private void Start() {
         UpdateAnchorId();
@@ -102,9 +103,8 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         if (isInInteractMode) {
             hingeJoint2D.enabled = false;
 
-            if (isMovingInteractPoint) {
+            if (isUsingStickBasedClawMovement) {
                 clawRigidBody2D.gravityScale = 0f;
-
 
                 Vector2 targetPosition = (Vector2)clawTransform.position + interactPointMoveDirection * moveInteractPointSpeed * Time.fixedDeltaTime;
 
@@ -140,12 +140,14 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         if (isCarryingHeavyWeight) {
             hingeJoint2D.enabled = false;
 
+            clawRigidBody2D.constraints = RigidbodyConstraints2D.FreezeAll;
+
             print("isCarryingHeavyWeight");
             return;
         }
         else {
             clawRigidBody2D.constraints = RigidbodyConstraints2D.None;
-            print("distributed");
+            print("weight tolerable");
         }
 
         grabbedObject.UpdateAnchorTargetWorldPosition(anchorId, anchorPoint.position);
@@ -235,7 +237,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
         AssignGrabbedObject();
 
-        SetIgnoredCollision(userColliders, grabbedObjectColliders, true);
+        objectCollisionPhasing.SetIgnoredCollision(userColliders, grabbedObjectColliders, true);
 
         grabbedObject.AddAnchorPoint(anchorId, anchorPoint.position);
 
@@ -250,17 +252,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         grabbedObjectColliders = grabbedObject.GetComponentsInChildren<Collider2D>();
     }
 
-    private void SetIgnoredCollision(Collider2D[] collidersA, Collider2D[] collidersB, bool ignore) {
-        foreach (Collider2D colliderA in collidersA) {
-            if (colliderA == null || colliderA.isTrigger) { continue; }
 
-            foreach (Collider2D colliderB in collidersB) {
-                if (colliderB == null || colliderB.isTrigger) { continue; }
-
-                Physics2D.IgnoreCollision(colliderA, colliderB, ignore);
-            }
-        }
-    }
 
     private void Release() {
         ClawOpened?.Invoke();
@@ -298,7 +290,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
             StartCoroutine(CheckForOverlappingCollider(grabbedObjectColliders));
         }
         else {
-            SetIgnoredCollision(userColliders, grabbedObjectColliders, false);
+            objectCollisionPhasing.SetIgnoredCollision(userColliders, grabbedObjectColliders, false);
         }
     }
 
@@ -311,7 +303,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
             yield return new WaitForSeconds(overlapCheckInterval);
         }
 
-        SetIgnoredCollision(userColliders, colliders, false);
+        objectCollisionPhasing.SetIgnoredCollision(userColliders, colliders, false);
     }
 
     private bool CheckForOverlappingColliders(Collider2D[] collidersA, Collider2D[] collidersB) {
@@ -379,7 +371,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         if (!enabled) {
             Release();
 
-            isMovingInteractPoint = false;
+            isUsingStickBasedClawMovement = false;
         }
     }
 }

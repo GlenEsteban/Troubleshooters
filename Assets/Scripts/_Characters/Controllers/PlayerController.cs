@@ -1,15 +1,15 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Windows;
 
 /// <summary>
 /// Processes player input to control movement, orientation,
-/// and attachment interactions.
+/// and attachment interactions across different devices.
 /// </summary>
 [RequireComponent(typeof(Rigidbody2DMovement))]
 [RequireComponent(typeof(LookOrientation))]
 public class PlayerController : MonoBehaviour {
     [SerializeField] private Transform playerCenter;
+
     private PlayerInputActions playerInputActions;
     private InputDevice currentDevice;
     private Rigidbody2DMovement rigidBody2DMovement;
@@ -55,6 +55,12 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void Update() {
+        UpdateClawInteractPointPosition();
+
+        UpdateClawInteractPointMoveDirection();
+    }
+
+    private void UpdateClawInteractPointPosition() {
         if (currentDevice is Mouse || currentDevice is Keyboard) {
             clawAttachment.SetIsMovingInteractPoint(false);
 
@@ -67,10 +73,11 @@ public class PlayerController : MonoBehaviour {
 
             clawAttachment.SetClawInteractPoint(mouseWorldPosition);
         }
+    }
 
+    private void UpdateClawInteractPointMoveDirection() {
         if (currentDevice is Gamepad) {
             clawAttachment.SetInteractPointMoveDirection(interactPointMoveDirection);
-            print(interactPointMoveDirection);
         }
     }
 
@@ -99,20 +106,20 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void MoveInteractPoint(InputAction.CallbackContext context) {
-        if (context.performed) {
+        if (context.performed && currentDevice is Gamepad) {
             currentDevice = context.control.device;
 
             clawAttachment.SetIsMovingInteractPoint(true);
-        }
 
-        interactPointMoveDirection = context.ReadValue<Vector2>();
+            interactPointMoveDirection = context.ReadValue<Vector2>();
+        }
     }
 
     private void AttachmentPrimaryUse(InputAction.CallbackContext context) {
         if (context.performed) {
             currentDevice = context.control.device;
 
-            clawAttachment?.PrimaryUse();
+            clawAttachment.PrimaryUse();
         }
     }
 
