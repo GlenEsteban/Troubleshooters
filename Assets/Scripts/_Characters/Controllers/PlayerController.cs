@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour {
 
             lookOrientation.SetLookDirection(selfToMouseDisplacement.normalized);
 
-            clawAttachment.SetClawInteractPoint(mouseWorldPosition);
+            clawAttachment.SetInteractPointPosition(mouseWorldPosition);
         }
     }
 
@@ -110,9 +110,9 @@ public class PlayerController : MonoBehaviour {
             currentDevice = context.control.device;
 
             clawAttachment.SetIsMovingInteractPoint(true);
-
-            interactPointMoveDirection = context.ReadValue<Vector2>();
         }
+
+        interactPointMoveDirection = context.ReadValue<Vector2>();
     }
 
     private void AttachmentPrimaryUse(InputAction.CallbackContext context) {

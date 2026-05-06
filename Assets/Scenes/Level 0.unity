@@ -1187,8 +1187,6 @@ GameObject:
   - component: {fileID: 277600881}
   - component: {fileID: 277600879}
   - component: {fileID: 277600878}
-  - component: {fileID: 277600882}
-  - component: {fileID: 277600883}
   m_Layer: 7
   m_Name: Claw Attachment
   m_TagString: Untagged
@@ -1253,8 +1251,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClawAttachment
   userTransform: {fileID: 701270181}
-  userColliders:
-  - {fileID: 701270182}
   clawRigidBody2D: {fileID: 1040299823}
   clawTransform: {fileID: 1040299820}
   detector: {fileID: 337104077}
@@ -1262,8 +1258,6 @@ MonoBehaviour:
   anchorPoint: {fileID: 337104075}
   unintendedReleaseThreshold: 1.5
   weightTolerance: 501
-  grabbedObjectColliders:
-  - {fileID: 1111013411}
   targetLayer:
     serializedVersion: 2
     m_Bits: 40832
@@ -1279,31 +1273,6 @@ MonoBehaviour:
   stiffness: 500
   damping: 25
   maxForce: 350
---- !u!114 &277600882
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 277600876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ade7341d367f074a9d13d4e7ee8924d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  useTriggers: 0
---- !u!114 &277600883
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 277600876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c27b22e5bc2b8f4ea50ffe6c8bfb3c5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
 --- !u!1 &325557986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1589,7 +1558,7 @@ GameObject:
   m_Component:
   - component: {fileID: 326217595}
   m_Layer: 0
-  m_Name: _Systems / Resources
+  m_Name: _Helper / Utilities
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -51308,7 +51277,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d387d1ae7c6cc2a4cba5f2c4a3dec1db, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -51331,7 +51300,7 @@ SpriteRenderer:
   m_SortingLayer: 7
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 11affb9bcbeabb049a39e317998fac7a, type: 3}
+  m_Sprite: {fileID: 522908116, guid: bdb3f15c032d277419119d986091e67a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -51339,7 +51308,7 @@ SpriteRenderer:
   m_Size: {x: 2, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
 --- !u!1 &2016668007
 GameObject:

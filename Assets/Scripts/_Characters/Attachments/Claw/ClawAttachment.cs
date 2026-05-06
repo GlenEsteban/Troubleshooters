@@ -18,7 +18,6 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     [Header("User References")]
     [SerializeField] private Transform userTransform;
-    [SerializeField] private Collider2D[] userColliders;
 
     [Header("Claw References")]
     [SerializeField] private Rigidbody2D clawRigidBody2D;
@@ -34,7 +33,6 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [SerializeField, Range(0f, 9999)] private float weightTolerance = 501f;
 
     [Header("Ignored Collisions")]
-    [SerializeField] private Collider2D[] grabbedObjectColliders;
     [SerializeField] private LayerMask targetLayer;
     [SerializeField, Range(0f, 1)] private float overlapCheckInterval = 0.1f;
 
@@ -51,25 +49,23 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     private GrabbableObject grabbedObject;
     private HingeJoint2D hingeJoint2D;
-    private ObjectCollisionPhasing objectCollisionPhasing;
+    private IUsableObject usableObject;
 
     private Vector2 clawInteractPoint;
     private Vector2 interactPointMoveDirection;
-
-    private IUsableObject usableObject;
 
     private float defaultClawGravityScale;
 
     private bool isClawClosed = false;
     private bool isInInteractMode = false;
-    private bool isUsingStickBasedClawMovement = false;
+    private bool IsMovingInteractPoint = false;
 
-    public void SetIsMovingInteractPoint(bool state) {
-        isUsingStickBasedClawMovement = state;
+    public void SetInteractPointPosition(Vector2 direction) {
+        clawInteractPoint = direction;
     }
 
-    public void SetClawInteractPoint(Vector2 direction) {
-        clawInteractPoint = direction;
+    public void SetIsMovingInteractPoint(bool state) {
+        IsMovingInteractPoint = state;
     }
 
     public void SetInteractPointMoveDirection(Vector2 direction) {
@@ -86,9 +82,8 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     private void Awake() {
         hingeJoint2D = GetComponentInChildren<HingeJoint2D>();
-
-        objectCollisionPhasing = GetComponent<ObjectCollisionPhasing>();
     }
+
     private void Start() {
         UpdateAnchorId();
 
@@ -101,32 +96,10 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     private void FixedUpdate() {
         if (isInInteractMode) {
-            hingeJoint2D.enabled = false;
-
-            if (isUsingStickBasedClawMovement) {
-                clawRigidBody2D.gravityScale = 0f;
-
-                Vector2 targetPosition = (Vector2)clawTransform.position + interactPointMoveDirection * moveInteractPointSpeed * Time.fixedDeltaTime;
-
-                MoveClawToPosition(targetPosition);
-            }
-            else {
-                clawRigidBody2D.gravityScale = defaultClawGravityScale;
-
-                MoveClawToPosition(clawInteractPoint);
-            }
-
-            OrientClawAwayFromUser();
+            MoveAndOrientClaw();
         }
-        else if (!hingeJoint2D.enabled) {
-            clawRigidBody2D.gravityScale = defaultClawGravityScale;
-
-            bool isPositioned = MoveClawToReturnPosition();
-            bool isOriented = OrientClawToReturnRotation();
-
-            if (isPositioned && isOriented) {
-                hingeJoint2D.enabled = true;
-            }
+        else {
+            ReturnClaw();
         }
 
         if (grabbedObject == null || anchorPoint == null) {
@@ -138,21 +111,47 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         bool isCarryingHeavyWeight = weightTolerance < grabbedObject.GetDistributedWeight();
 
         if (isCarryingHeavyWeight) {
-            hingeJoint2D.enabled = false;
-
-            clawRigidBody2D.constraints = RigidbodyConstraints2D.FreezeAll;
-
-            print("isCarryingHeavyWeight");
-            return;
+            print("isCarryingHeavyWeight");            
         }
         else {
-            clawRigidBody2D.constraints = RigidbodyConstraints2D.None;
             print("weight tolerable");
         }
 
         grabbedObject.UpdateAnchorTargetWorldPosition(anchorId, anchorPoint.position);
 
         CheckForUnintendedRelease();
+    }
+
+    private void MoveAndOrientClaw() {
+        hingeJoint2D.enabled = false;
+
+        if (IsMovingInteractPoint) {
+            clawRigidBody2D.gravityScale = 0f;
+
+            Vector2 targetPosition = (Vector2)clawTransform.position + interactPointMoveDirection * moveInteractPointSpeed * Time.fixedDeltaTime;
+
+            MoveClawToPosition(targetPosition);
+        }
+        else {
+            clawRigidBody2D.gravityScale = defaultClawGravityScale;
+
+            MoveClawToPosition(clawInteractPoint);
+        }
+
+        OrientClawAwayFromUser();
+    }
+
+    private void ReturnClaw() {
+        if (hingeJoint2D.enabled) { return; }
+
+        clawRigidBody2D.gravityScale = defaultClawGravityScale;
+
+        bool isPositioned = MoveClawToReturnPosition();
+        bool isOriented = OrientClawToReturnRotation();
+
+        if (isPositioned && isOriented) {
+            hingeJoint2D.enabled = true;
+        }
     }
 
     private bool MoveClawToReturnPosition() {
@@ -235,33 +234,23 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
             return;
         }
 
-        AssignGrabbedObject();
+        grabbedObject = detector.GetFirstGrabbableObject();
 
-        objectCollisionPhasing.SetIgnoredCollision(userColliders, grabbedObjectColliders, true);
+        IgnoredCollisionUtility.IgnoreCollisions(userTransform, grabbedObject.transform, true);
 
         grabbedObject.AddAnchorPoint(anchorId, anchorPoint.position);
 
         GrabbedObject?.Invoke();
     }
 
-    private void AssignGrabbedObject() {
-        grabbedObject = detector.GetFirstGrabbableObject();
-
-        if (grabbedObject == null) { return; }
-
-        grabbedObjectColliders = grabbedObject.GetComponentsInChildren<Collider2D>();
-    }
-
-
-
     private void Release() {
         ClawOpened?.Invoke();
 
         if (grabbedObject == null) { return; }
 
-        ReleaseGrabbedObject();
+        TryRestoreCollisions();
 
-        RunCheckForOverlappingColliders();
+        ReleaseGrabbedObject();
 
         ReleasedObject?.Invoke();
     }
@@ -269,9 +258,9 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     private void UnintendedRelease() {
         if (grabbedObject == null) { return; }
 
-        ReleaseGrabbedObject();
+        TryRestoreCollisions();
 
-        RunCheckForOverlappingColliders();
+        ReleaseGrabbedObject();
 
         UnintentionallyReleased?.Invoke();
     }
@@ -283,53 +272,22 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         usableObject = null;
     }
 
-    private void RunCheckForOverlappingColliders() {
-        bool areObjectsOverlapping = CheckForOverlappingColliders(userColliders, grabbedObjectColliders);
+    private void TryRestoreCollisions() {
+        bool areObjectsOverlapping = IgnoredCollisionUtility.CheckForOverlappingObjects(userTransform, grabbedObject.transform, targetLayer);
 
         if (areObjectsOverlapping) {
-            StartCoroutine(CheckForOverlappingCollider(grabbedObjectColliders));
+            StartCoroutine(
+                IgnoredCollisionUtility.EnableCollisionsWhenSeparated(
+                    userTransform,
+                    grabbedObject.transform,
+                    targetLayer,
+                    overlapCheckInterval
+                )
+            );
         }
         else {
-            objectCollisionPhasing.SetIgnoredCollision(userColliders, grabbedObjectColliders, false);
+            IgnoredCollisionUtility.IgnoreCollisions(userTransform, grabbedObject.transform, false);
         }
-    }
-
-    private IEnumerator CheckForOverlappingCollider(Collider2D[] colliders) {
-        bool areObjectsOverlapping = true;
-
-        while (areObjectsOverlapping) {
-            areObjectsOverlapping = CheckForOverlappingColliders(userColliders, colliders);
-
-            yield return new WaitForSeconds(overlapCheckInterval);
-        }
-
-        objectCollisionPhasing.SetIgnoredCollision(userColliders, colliders, false);
-    }
-
-    private bool CheckForOverlappingColliders(Collider2D[] collidersA, Collider2D[] collidersB) {
-        ContactFilter2D filter = new ContactFilter2D();
-        filter.SetLayerMask(targetLayer);
-        filter.useTriggers = false;
-
-        Collider2D[] results = new Collider2D[10];
-
-        foreach (Collider2D colliderA in collidersA) {
-            if (colliderA == null) continue;
-
-            int overlapCount = colliderA.Overlap(filter, results);
-
-            for (int i = 0; i < overlapCount; i++) {
-                for (int j = 0; j < collidersB.Length; j++) {
-                    if (collidersB[j].isTrigger) continue;
-
-                    if (results[i] == collidersB[j]) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
     }
 
     private void ToggleClawState() {
@@ -371,7 +329,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         if (!enabled) {
             Release();
 
-            isUsingStickBasedClawMovement = false;
+            IsMovingInteractPoint = false;
         }
     }
 }
