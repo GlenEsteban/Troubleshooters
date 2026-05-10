@@ -42,7 +42,7 @@ public class Rigidbody2DMovement : MonoBehaviour {
     }
 
     private void Start() {
-        isGroundedCharacter = rb.gravityScale != 0 ? true : false;
+        isGroundedCharacter = rb.gravityScale >= 0 ? true : false;
     }
 
     void FixedUpdate() {

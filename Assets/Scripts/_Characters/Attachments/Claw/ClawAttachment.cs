@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
 
@@ -14,7 +13,6 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     public event Action NothingGrabbed;
     public event Action GrabbedObject;
     public event Action ReleasedObject;
-    public event Action UnintentionallyReleased;
 
     [Header("User References")]
     [SerializeField] private Transform userTransform;
@@ -23,11 +21,10 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [SerializeField] private Rigidbody2D clawRigidBody2D;
     [SerializeField] private Transform clawTransform;
     [SerializeField] private GrabbableObjectDetector detector;
+    [SerializeField] private HingeJoint2D clawHingeJoint2D;
 
     [Header("Anchor")]
-    [SerializeField] private int anchorId;
     [SerializeField] private Transform anchorPoint;
-    [SerializeField] private float unintendedReleaseThreshold = 1f;
 
     [Header("Weight Tolerance")]
     [SerializeField, Range(0f, 9999)] private float weightTolerance = 501f;
@@ -38,17 +35,18 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     [Header("Claw Movement Spring-Damper System")]
     [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private Vector2 returnPosition = new Vector2(0, -0.931f);
+    [SerializeField] private Vector2 returnPosition = new Vector2(0, -0.881f);
     [SerializeField, Range(1f, 100)] private float moveInteractPointSpeed = 50f;
-    [SerializeField, Range(0.04f, 20)] private float returnPositionThreshold = 0.04f;
+    [SerializeField, Range(0.04f, 1f)] private float returnPositionThreshold = 0.04f;
     [SerializeField, Range(0.01f, 20)] private float orientClawThreshold = 0.4f;
     [SerializeField, Range(0f, 2000)] private float rotationSpeed = 300f;
     [SerializeField, Range(0f, 500)] private float stiffness = 300f;
     [SerializeField, Range(0f, 50)] private float damping = 50f;
     [SerializeField, Range(0f, 500)] private float maxForce = 300f;
 
+    private HingeJoint2D grabbedObjectHingeJoint2D;
     private GrabbableObject grabbedObject;
-    private HingeJoint2D hingeJoint2D;
+
     private IUsableObject usableObject;
 
     private Vector2 clawInteractPoint;
@@ -72,26 +70,8 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         interactPointMoveDirection = direction;
     }
 
-    private void OnEnable() {
-        CharacterManager.Instance.RegistryOrderUpdated += UpdateAnchorId;
-    }
-
-    private void OnDisable() {
-        CharacterManager.Instance.RegistryOrderUpdated -= UpdateAnchorId;
-    }
-
-    private void Awake() {
-        hingeJoint2D = GetComponentInChildren<HingeJoint2D>();
-    }
-
     private void Start() {
-        UpdateAnchorId();
-
         defaultClawGravityScale = clawRigidBody2D.gravityScale;
-    }
-
-    private void UpdateAnchorId() {
-        anchorId = CharacterManager.Instance.GetPlayerIndex(GetComponentInParent<Character>());
     }
 
     private void FixedUpdate() {
@@ -115,15 +95,11 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         }
         else {
             print("weight tolerable");
-        }
-
-        grabbedObject.UpdateAnchorTargetWorldPosition(anchorId, anchorPoint.position);
-
-        CheckForUnintendedRelease();
+        }    
     }
 
     private void MoveAndOrientClaw() {
-        hingeJoint2D.enabled = false;
+        clawHingeJoint2D.enabled = false;
 
         if (IsMovingInteractPoint) {
             clawRigidBody2D.gravityScale = 0f;
@@ -142,7 +118,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     private void ReturnClaw() {
-        if (hingeJoint2D.enabled) { return; }
+        if (clawHingeJoint2D.enabled) { return; }
 
         clawRigidBody2D.gravityScale = defaultClawGravityScale;
 
@@ -150,7 +126,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         bool isOriented = OrientClawToReturnRotation();
 
         if (isPositioned && isOriented) {
-            hingeJoint2D.enabled = true;
+            clawHingeJoint2D.enabled = true;
         }
     }
 
@@ -164,6 +140,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         }
 
         MoveClawToPosition(targetPosition);
+
         return false;
     }
 
@@ -210,19 +187,6 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         clawRigidBody2D.AddForce(force);
     }
 
-
-    private void CheckForUnintendedRelease() {
-        if (anchorPoint == null) { return; }
-
-        Vector2 targetAnchorWorldPos = grabbedObject.GetAnchorWorldPosition(anchorId);
-
-        float targetToAnchorPointDistance = Vector2.Distance(targetAnchorWorldPos, anchorPoint.position);
-
-        if (targetToAnchorPointDistance > unintendedReleaseThreshold) {
-            UnintendedRelease();
-        }
-    }
-
     private void Grab() {
         ClawClosed?.Invoke();
 
@@ -238,7 +202,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
         IgnoredCollisionUtility.IgnoreCollisions(userTransform, grabbedObject.transform, true);
 
-        grabbedObject.AddAnchorPoint(anchorId, anchorPoint.position);
+        grabbedObjectHingeJoint2D = grabbedObject.CreateHingeJoint2D(clawRigidBody2D);
 
         GrabbedObject?.Invoke();
     }
@@ -255,18 +219,10 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         ReleasedObject?.Invoke();
     }
 
-    private void UnintendedRelease() {
-        if (grabbedObject == null) { return; }
-
-        TryRestoreCollisions();
-
-        ReleaseGrabbedObject();
-
-        UnintentionallyReleased?.Invoke();
-    }
-
     private void ReleaseGrabbedObject() {
-        grabbedObject.RemoveAnchorPoint(anchorId);
+        grabbedObject.DestroyJoint(grabbedObjectHingeJoint2D);
+
+        grabbedObjectHingeJoint2D = null;
         grabbedObject = null;
 
         usableObject = null;

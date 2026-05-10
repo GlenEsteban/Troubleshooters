@@ -1255,7 +1255,9 @@ MonoBehaviour:
   clawTransform: {fileID: 1040299820}
   detector: {fileID: 337104077}
   clawHingeJoint2D: {fileID: 1040299826}
+  anchorId: 0
   anchorPoint: {fileID: 337104075}
+  unintendedReleaseThreshold: 1.5
   weightTolerance: 501
   targetLayer:
     serializedVersion: 2
@@ -1269,9 +1271,9 @@ MonoBehaviour:
   returnPositionThreshold: 0.04
   orientClawThreshold: 0.4
   rotationSpeed: 1000
-  stiffness: 100
-  damping: 5
-  maxForce: 50
+  stiffness: 500
+  damping: 25
+  maxForce: 350
 --- !u!1 &325557986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1818,7 +1820,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 0.1
+  m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0
   m_GravityScale: 2
@@ -37011,7 +37013,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 0.1
+  m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 30
   m_GravityScale: 2
@@ -39156,7 +39158,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 0.25
+  m_Mass: 5
   m_LinearDamping: 1
   m_AngularDamping: 10
   m_GravityScale: 2
@@ -39178,7 +39180,7 @@ DistanceJoint2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1040299819}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   m_EnableCollision: 0
   m_ConnectedRigidBody: {fileID: 1533485076}
@@ -39542,7 +39544,7 @@ Rigidbody2D:
   m_Mass: 2
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 2
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -44693,10 +44695,10 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 5
+  m_Mass: 75
   m_LinearDamping: 0
   m_AngularDamping: 0
-  m_GravityScale: -0.1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -44874,7 +44876,7 @@ MonoBehaviour:
   weight: 1000
   maxDistance: 0.05
   useLimits: 1
-  minLimit: 0
+  minLimit: 0.05
   maxLimit: 0.05
   stiffness: 1000
   damping: 30

@@ -25,7 +25,6 @@ public class ClawAttachmentAnimator : MonoBehaviour {
         clawAttachment.GrabbedObject += AnimateCyanIndicatorLight;
         clawAttachment.ClawOpened += AnimateMagentaIndicatorLight;
         clawAttachment.ReleasedObject += AnimateMagentaIndicatorLight;
-        clawAttachment.UnintentionallyReleased += AnimateYellowIndicatorLight;
     }
 
     private void OnDisable() {
@@ -35,7 +34,6 @@ public class ClawAttachmentAnimator : MonoBehaviour {
         clawAttachment.GrabbedObject -= AnimateCyanIndicatorLight;
         clawAttachment.ClawOpened -= AnimateMagentaIndicatorLight;
         clawAttachment.ReleasedObject -= AnimateMagentaIndicatorLight;
-        clawAttachment.UnintentionallyReleased -= AnimateYellowIndicatorLight;
     }
 
     private void AnimateClawClosed() {
