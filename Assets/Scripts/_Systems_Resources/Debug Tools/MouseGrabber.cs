@@ -17,10 +17,6 @@ public class MouseGrabber : MonoBehaviour {
             TryGrab(mouseWorldPosition);
         }
 
-        if (Input.GetMouseButton(0) && grabbedObject != null) {
-            grabbedObject.UpdateAnchorTargetWorldPosition(anchorID, mouseWorldPosition);
-        }
-
         if (Input.GetMouseButtonUp(0)) {
             Release();
         }
@@ -37,7 +33,8 @@ public class MouseGrabber : MonoBehaviour {
             if (grabbable == null) { continue; }
 
             grabbedObject = grabbable;
-            grabbedObject.AddAnchorPoint(anchorID, worldPos);
+
+            //grabbedObject.CreateHingeJoint2D();
 
             return;
         }
@@ -46,7 +43,8 @@ public class MouseGrabber : MonoBehaviour {
     void Release() {
         if (grabbedObject == null) { return; }
 
-        grabbedObject.RemoveAnchorPoint(anchorID);
+        //grabbedObject.DestroyHingeJoint2D();
+
         grabbedObject = null;        
     }
 }

@@ -220,7 +220,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     private void ReleaseGrabbedObject() {
-        grabbedObject.DestroyJoint(grabbedObjectHingeJoint2D);
+        grabbedObject.DestroyHingeJoint2D(grabbedObjectHingeJoint2D);
 
         grabbedObjectHingeJoint2D = null;
         grabbedObject = null;
