@@ -28,14 +28,14 @@ public class GrabbableObject : MonoBehaviour {
     [SerializeField, Range(0f, 5000f)] private float damping = 30f;
     [SerializeField, Range(0f, 5000f)] private float maxForce = 1000f;
 
-    private Rigidbody2D rigidBody2D;
-
     private class AnchorPoint {
         public Vector2 anchorLocalPosition;
         public Vector2 targetWorldPosition;
     }
 
     private readonly Dictionary<int, AnchorPoint> anchorPoints = new Dictionary<int, AnchorPoint>();
+
+    private Rigidbody2D rigidBody2D;
 
     public float GetDistributedWeight() {
         if (anchorPoints.Count == 0) { return weight; }
@@ -109,10 +109,17 @@ public class GrabbableObject : MonoBehaviour {
     //    return distanceJoint2D;
     //}
 
-    public HingeJoint2D CreateHingeJoint2D(Rigidbody2D connectedRigidbody2D) {
+    public HingeJoint2D CreateHingeJoint2D(Rigidbody2D connectedRigidbody2D, Vector3 anchorPosition) {
         HingeJoint2D hingeJoint2D = gameObject.AddComponent<HingeJoint2D>();
 
+        if (hingeJoint2D == null) { return null; }
+
         hingeJoint2D.connectedBody = connectedRigidbody2D;
+
+        hingeJoint2D.autoConfigureConnectedAnchor = false;
+        hingeJoint2D.anchor = transform.InverseTransformPoint(anchorPosition);
+        hingeJoint2D.connectedAnchor = Vector2.zero;
+
         hingeJoint2D.useLimits = useLimits;
 
         JointAngleLimits2D limits = hingeJoint2D.limits;
@@ -125,7 +132,7 @@ public class GrabbableObject : MonoBehaviour {
         return hingeJoint2D;
     }
 
-    public void DestroyJoint(Joint2D joint) {
+    public void DestroyJoint(HingeJoint2D joint) {
         if (joint == null) { return; }
 
         Destroy(joint);

@@ -202,7 +202,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
         IgnoredCollisionUtility.IgnoreCollisions(userTransform, grabbedObject.transform, true);
 
-        grabbedObjectHingeJoint2D = grabbedObject.CreateHingeJoint2D(clawRigidBody2D);
+        grabbedObjectHingeJoint2D = grabbedObject.CreateHingeJoint2D(clawRigidBody2D, anchorPoint.position);
 
         GrabbedObject?.Invoke();
     }
