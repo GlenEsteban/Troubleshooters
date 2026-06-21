@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Debug tool that moves this object to follow the mouse cursor in world space.
@@ -6,8 +7,12 @@ using UnityEngine;
 /// </summary>
 public class FollowTargetMouse : MonoBehaviour {
     [SerializeField] private Camera cam;
+
     void Update() {
-        Vector3 mouseWorldPosition = cam.ScreenToWorldPoint(Input.mousePosition);
+        if (Mouse.current == null) { return; }
+
+        Vector2 mouseScreenSpacePosition = Mouse.current.position.ReadValue();
+        Vector3 mouseWorldPosition = cam.ScreenToWorldPoint(mouseScreenSpacePosition);
 
         // Reset Z to 0 for 2D
         mouseWorldPosition.z = 0;

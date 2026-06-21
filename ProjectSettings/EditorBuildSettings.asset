@@ -30,5 +30,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Game End.unity
     guid: 6baeb220a5b70cf458d33781c08dd6b5
   m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 1cb928ed3a65bbb459275aceed8a13d1, type: 3}
   m_UseUCBPForAssetBundles: 0

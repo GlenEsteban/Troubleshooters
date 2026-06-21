@@ -13,8 +13,8 @@ public class GrabbableObject : MonoBehaviour {
 
     [Header("Hinge Joint 2D")]
     [SerializeField, Range(0f, 9999f)] private bool useLimits = true;
-    [SerializeField, Range(-180, 0)] private float minLimit = -15;
-    [SerializeField, Range(0, 180)] private float maxLimit = 15;
+    [SerializeField, Range(-180, 0)] private float minLimit = -180;
+    [SerializeField, Range(0, 180)] private float maxLimit = 180;
 
     public float anchorPointCount = 0;
 

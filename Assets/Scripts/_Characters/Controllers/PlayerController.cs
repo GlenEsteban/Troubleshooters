@@ -102,7 +102,7 @@ public class PlayerController : MonoBehaviour {
             currentDevice = context.control.device;
 
             clawAttachment.ToggleInteractMode();
-        }   
+        }
     }
 
     private void MoveInteractPoint(InputAction.CallbackContext context) {

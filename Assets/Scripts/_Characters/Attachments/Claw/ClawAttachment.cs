@@ -45,7 +45,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     [SerializeField, Range(0f, 500)] private float maxForce = 300f;
 
     private HingeJoint2D grabbedObjectHingeJoint2D;
-    private GrabbableObject grabbedObject;
+    private GrabbableObject grabbedObject; 
 
     private IUsableObject usableObject;
 
@@ -75,11 +75,11 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
     }
 
     private void FixedUpdate() {
-        if (isInInteractMode) {
-            MoveAndOrientClaw();
-        }
-        else {
+        if (!isInInteractMode) {
             ReturnClaw();
+        }
+        else if (isInInteractMode) {
+            MoveAndOrientClaw();
         }
 
         if (grabbedObject == null || anchorPoint == null) {
@@ -104,7 +104,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         if (IsMovingInteractPoint) {
             clawRigidBody2D.gravityScale = 0f;
 
-            Vector2 targetPosition = (Vector2)clawTransform.position + interactPointMoveDirection * moveInteractPointSpeed * Time.fixedDeltaTime;
+            Vector2 targetPosition = (Vector2) clawTransform.position + interactPointMoveDirection * moveInteractPointSpeed * Time.fixedDeltaTime;
 
             MoveClawToPosition(targetPosition);
         }
@@ -114,12 +114,13 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
             MoveClawToPosition(clawInteractPoint);
         }
 
-        OrientClawAwayFromUser();
+        if (grabbedObject == null) {
+            OrientClawAwayFromUser();
+        }
     }
 
     private void ReturnClaw() {
         if (clawHingeJoint2D.enabled) { return; }
-
         clawRigidBody2D.gravityScale = defaultClawGravityScale;
 
         bool isPositioned = MoveClawToReturnPosition();
@@ -128,7 +129,7 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
         if (isPositioned && isOriented) {
             clawHingeJoint2D.enabled = true;
         }
-    }
+    }    
 
     private bool MoveClawToReturnPosition() {
         Vector2 targetPosition = (Vector2)userTransform.position + returnPosition;
@@ -277,15 +278,10 @@ public class ClawAttachment : MonoBehaviour, IAttachment{
 
     public void ToggleInteractMode() {
         isInInteractMode = !isInInteractMode;
-    }
 
-    public void SetInteractMode(bool enabled) {
-        isInInteractMode = enabled;
-
-        if (!enabled) {
+        if (!isInInteractMode) {
             Release();
-
-            IsMovingInteractPoint = false;
+            isClawClosed = false;
         }
     }
 }
